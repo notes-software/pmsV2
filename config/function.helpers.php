@@ -90,7 +90,6 @@ function sideAccess($parent)
 function showMenus($sideMenuData)
 {
 	$menus = "";
-	dd(sideAccess($sideMenuData));
 	foreach (sideAccess($sideMenuData) as $parent => $parentData) {
 
 		if ($parentData['isTree']) {

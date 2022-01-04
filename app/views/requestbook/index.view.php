@@ -20,8 +20,7 @@ require __DIR__ . '/../layouts/head.php'; ?>
         <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
                 <li class="breadcrumb-item"><a href="<?= route('/') ?>">Dashboard</a></li>
-                <li class="breadcrumb-item active">Master Data</li>
-                <li class="breadcrumb-item active">Branch</li>
+                <li class="breadcrumb-item active"><?= ucfirst($pageTitle) ?></li>
             </ol>
         </div><!-- /.col -->
     </div><!-- /.row -->
@@ -38,8 +37,8 @@ require __DIR__ . '/../layouts/head.php'; ?>
 
                 <div class="card-tools">
                     <div class="align-left">
-                        <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#create_branch_modal">Add branch</button>
-                        <button type="button" id="delete_branch_btn" class="btn btn-default btn-sm" onclick="deleteBranch()">Delete selected branch</button>
+                        <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#create_branch_modal">Add request</button>
+                        <button type="button" id="delete_branch_btn" class="btn btn-default btn-sm" onclick="deleteBranch()">Delete selected request</button>
                     </div>
                 </div>
 
@@ -58,18 +57,20 @@ require __DIR__ . '/../layouts/head.php'; ?>
                 </thead>
                 <tbody>
                     <?php
-                    foreach ($branches as $branch) {
-                        $status = ($branch['status'] == 0) ? '<span style="color: green;">Active</span>' : '<span style="color: red;">Inactive</span>';
+                    if ($requests != null) {
+                        foreach ($requests as $request) {
+                            $status = ($request['status'] == 0) ? '<span style="color: green;">Active</span>' : '<span style="color: red;">Inactive</span>';
                     ?>
-                        <tr>
-                            <td class="no-sort text-center"><input type='checkbox' name='checkbox' value='<?= $branch['id'] ?>'></td>
-                            <td class="no-sort text-center">
-                                <a style="color: #605e5e;" onclick="editBranch('<?= $branch['id'] ?>')"><i class="far fa-edit"></i></a>
-                            </td>
-                            <td><?= $branch['name'] ?></td>
-                            <td style="width: 90px;"><?= $status ?></td>
-                        </tr>
-                    <?php } ?>
+                            <tr>
+                                <td class="no-sort text-center"><input type='checkbox' name='checkbox' value='<?= $request['id'] ?>'></td>
+                                <td class="no-sort text-center">
+                                    <a style="color: #605e5e;" onclick="editBranch('<?= $request['id'] ?>')"><i class="far fa-edit"></i></a>
+                                </td>
+                                <td><?= $request['name'] ?></td>
+                                <td style="width: 90px;"><?= $status ?></td>
+                            </tr>
+                    <?php }
+                    } ?>
                 </tbody>
             </table>
         </div>
@@ -82,8 +83,8 @@ require __DIR__ . '/../layouts/head.php'; ?>
     <!-- /.card -->
 </section>
 
-<?php include_once __DIR__ . '/create_branch_modal.php'; ?>
-<?php include_once __DIR__ . '/edit_branch_modal.php'; ?>
+<?php include_once __DIR__ . '/create_request_modal.php'; ?>
+<?php include_once __DIR__ . '/edit_request_modal.php'; ?>
 
 <script type="text/javascript">
     $(function() {

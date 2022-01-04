@@ -29,12 +29,77 @@ require 'layouts/head.php'; ?>
 
 <!-- Main content -->
 <section class="content">
-    <div class="col-12">
-        <div class="d-flex flex-column align-items-center justify-content-center">
-            <h2 class="mb-0 text-muted welcome-msg">Welcome back, <?= Auth::user('fullname') ?></h2>
-            <p class="text-muted">
-            <h3><?= selectTedBranch() ?></h3>
-            </p>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-7">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-bullhorn text-danger"></i>
+                            Due and Past Due Tasks ( <span class="text-success">IN PROGESS</span> )
+                        </h3>
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body">
+
+                        <div class="card bg-gradient-warning">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                CODE: KPLM2659
+                                            </div>
+                                            <div class="col-md-6 text-right">
+                                                <i class="far fa-calendar-check"></i> 12/14/2020
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <pre class="mt-2" style="white-space: pre-wrap;font-family: inherit;font-size: inherit;padding: 0px;color: inherit;background: inherit;background : transparent;">purchase module add if close kag e open liwat wla ga reset ang mga textboxes,it should be reset before openning modal</pre>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        PRIORITY: MEDIUM
+                                    </div>
+                                    <div class="col-md-6 text-right">
+                                        <a href="#" style="color: inherit;">View Task</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- /.card-body -->
+                        </div>
+
+                    </div>
+                    <!-- /.card-body -->
+                </div>
+            </div>
+            <div class="col-lg-5">
+
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <span style="font-size: 16px;">Welcome back, <?= Auth::user('fullname') ?></span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.card-body -->
+                </div>
+
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <span style="font-size: 16px;">Current Version (v1.1)</span>
+                                <button type="button" class="btn btn-default btn-sm">What's new?</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.card-body -->
+                </div>
+
+            </div>
         </div>
     </div>
 </section>

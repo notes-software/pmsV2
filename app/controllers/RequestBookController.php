@@ -4,17 +4,17 @@ namespace App\Controllers;
 
 use App\Core\Request;
 
-class BranchController
+class RequestBookController
 {
 	public function index()
 	{
-		abort_if(gate_denies('branch_access'), '403 Forbidden');
+		// abort_if(gate_denies('branch_access'), '403 Forbidden');
 
-		$pageTitle = "Branch";
+		$pageTitle = "Request Book";
 
-		$branches = DB()->selectLoop("*", "branch", "id > 0 ORDER BY id DESC")->get();
+		$requests = DB()->selectLoop("*", "request_logs", "request_id > 0 ORDER BY request_id DESC")->get();
 
-		return view('/branch/index', compact('pageTitle', 'branches'));
+		return view('/requestbook/index', compact('pageTitle', 'requests'));
 	}
 
 	public function store()

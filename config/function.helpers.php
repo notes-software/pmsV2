@@ -1,34 +1,53 @@
 <?php
 
 use App\Core\Request;
+use App\Core\Auth;
 
-function getBranches()
+function getProjectName($projectCode, $col)
 {
-	$branches = DB()->selectLoop("*", "branch", "status = 0 ORDER BY name ASC")->get();
-	return $branches;
+	$projName = DB()->select($col, "projects", "projectCode = '$projectCode'")->get();
+	return $projName[$col];
 }
 
-function getBranchName($branch_id)
+function getTotalTask($projectCode)
 {
-	$branch = DB()->select("name", "branch", "id = '$branch_id'")->get();
-	return $branch['name'];
+	return count(getAllProjectTask($projectCode));
 }
 
-function selectTedBranch()
+function getFinishTask($projectCode)
 {
-	return (!empty($_SESSION['system']['branch_name'])) ? $_SESSION['system']['branch_name'] : "";
+	return count(getAllProjectTask($projectCode, '2'));
 }
 
-function getProductName($id)
+function getAllProjectTask($projectCode, $status = '')
 {
-	$prod = DB()->select("name", "products", "id = '$id'")->get();
-	return $prod['name'];
+	$withFilter = ($status != '') ? "AND status = '$status'" : "";
+	$tasks = DB()->selectLoop("*", "tasks", "projectCode = '$projectCode' {$withFilter}")->get();
+
+	return $tasks;
 }
 
-function getProductUnit($id)
+function getUserTask($projectCode, $member = '')
 {
-	$prod = DB()->select("name", "product_unit", "id = '$id'")->get();
-	return $prod['name'];
+	$userid = Auth::user('id');
+	$withFilter = ($member == "") ? "AND user_id = '$userid'" : "AND user_id = '$member'";
+	$getProject = DB()->selectLoop("*", "task_member", "projectCode = '$projectCode' {$withFilter}")
+		->andFilter([
+			"tasks" => "ORDER BY priority_stats DESC , taskDueDate ASC"
+		])
+		->with([
+			"tasks" => ['task_id', 'task_id'],
+			"users" => ['user_id', 'id']
+		])
+		->get();
+
+	return $getProject;
+}
+
+function getProjectPercentage($finishTasks, $totalTask)
+{
+	$percent = ($totalTask != 0) ? ($finishTasks / $totalTask) * 100 : 0;
+	return $percent;
 }
 
 function isActive($uri)
@@ -115,55 +134,3 @@ function showMenus($sideMenuData)
 
 	return $menus;
 }
-
-
-// if (in_array($prmssn['title'], $menu['DASHBOARD'])) {
-// 	if ($prmssn['title'] == $menu['DASHBOARD'][$prmssn['title']]) {
-// 		$menus .= '<li class="nav-item">
-// 		<a href="' . route('/dashboard') . '" class="nav-link ' . isActive('dashboard') . '">
-// 			<i class="nav-icon fas fa-home"></i>
-// 			<p>' . $main . '</p>
-// 		</a>
-// 	</li>';
-// 	}
-// }
-
-// if (in_array($prmssn['title'], $menu['MASTER DATA'])) {
-
-// 	$menus .= '<li class="nav-item ' . collapseTree(['branch', 'employee', 'product', 'supplier']) . '">
-// 	<a href="#" class="nav-link">
-// 		<i class="nav-icon fas fa-book"></i>
-// 		<p>
-// 			MASTER DATA
-// 			<i class="right fa fa-angle-left"></i>
-// 		</p>
-// 	</a><ul class="nav nav-treeview">';
-
-// 	if ($prmssn['title'] == $menu['MASTER DATA'][$prmssn['title']]) {
-// 		$menus .= '
-// 			<li class="nav-item">
-// 				<a href="' . route('/branch') . '" class="nav-link ' . isActive('branch') . '">
-// 					<i class="nav-icon far fa-circle"></i>
-// 					<p>Branch</p>
-// 				</a>
-// 			</li>
-// 			<li class="nav-item">
-// 				<a href="' . route('/employee') . '" class="nav-link ' . isActive('employee') . '">
-// 					<i class="nav-icon far fa-circle"></i>
-// 					<p>Employee</p>
-// 				</a>
-// 			</li>
-// 			<li class="nav-item">
-// 				<a href="' . route('/product') . '" class="nav-link ' . isActive('product') . '">
-// 					<i class="nav-icon far fa-circle"></i>
-// 					<p>Products</p>
-// 				</a>
-// 			</li>
-// 			<li class="nav-item">
-// 				<a href="' . route('/supplier') . '" class="nav-link ' . isActive('supplier') . '">
-// 					<i class="nav-icon far fa-circle"></i>
-// 					<p>Supplier</p>
-// 				</a>
-// 			</li>';
-// 	}
-// 	$menus .= '</ul></li>';

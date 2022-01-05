@@ -81,6 +81,7 @@ if (empty($_SESSION['system']['branch_id'])) {
 
 	<!-- jQuery -->
 	<script src="<?= public_url('/assets/adminlte/plugins/jquery/jquery.min.js') ?>"></script>
+	<script src="<?= public_url('/assets/adminlte/js/jquery-ui.min.js') ?>"></script>
 	<script src="<?= public_url('/assets/adminlte/plugins/sweetalert2/sweetalert2.min.js') ?>"></script>
 
 	<?php
@@ -98,19 +99,6 @@ if (empty($_SESSION['system']['branch_id'])) {
 			showConfirmButton: false,
 			timer: 3000
 		});
-
-		function page_loader(param) {
-			$("#page_loader_content").html(param);
-			$('#modalLoader').modal({
-				backdrop: 'static',
-				keyboard: false
-			});
-			$("#modalLoader").modal('show');
-		}
-
-		function page_loader_hide() {
-			$("#modalLoader").modal('hide');
-		}
 
 		function success_update() {
 			Toast.fire({
@@ -146,6 +134,10 @@ if (empty($_SESSION['system']['branch_id'])) {
 				title: 'Error executing query.'
 			});
 		}
+
+		$(function() {
+			$('[data-toggle="tooltip"]').tooltip()
+		});
 	</script>
 </head>
 </head>

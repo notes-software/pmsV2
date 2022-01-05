@@ -57,7 +57,8 @@ use App\Core\App;
             border: 1px solid #ccc;
         }
 
-        .table td, .table th {
+        .table td,
+        .table th {
             padding: 1.50rem;
         }
     </style>
@@ -94,7 +95,7 @@ use App\Core\App;
                         <li class="nav-item">
                             <a class="nav-link link-green" href="<?= route('/register') ?>">Register</a>
                         </li>
-                    <?php }else{ ?>
+                    <?php } else { ?>
                         <li class="nav-item">
                             <a class="nav-link link-green">&nbsp;</a>
                         </li>
@@ -125,7 +126,7 @@ use App\Core\App;
                                         <p class="card-text pt-1 text-muted">Visit Sprnva repository and explore other projects like migration, file uploads, dumper also known as dd() and also the flavoured templates of sprnva.</p>
                                     </td>
                                 </tr>
-                                 <tr>
+                                <tr>
                                     <td style="width: 50%;">
                                         <h5 class="card-title"><a class="wlcm-link" href="https://github.com/jagwarthegreat/jagwarthegreat/blob/main/README.md" target="_blank">The Author</a></h5>
                                         <p class="card-text pt-1 text-muted">Meet the creator and the mastermind behind the blast! the author of this fun is happy to see you. You might also want to follow him and send a feedback.</p>
@@ -141,7 +142,7 @@ use App\Core\App;
                 </div>
                 <div class="col-12" style="display: flex;flex-direction: row;justify-content: space-between;margin-top: 2px;padding: 0px;">
                     <div>
-                         <p class="card-text pt-1 text-muted"></p>
+                        <p class="card-text pt-1 text-muted"></p>
                     </div>
                     <div>
                         <div class="text-sm mb-3" style="font-size: 14px;">

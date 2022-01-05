@@ -39,6 +39,7 @@ Route::group(['prefix' => 'notebook', 'middleware' => ['auth']], function () {
 
 Route::group(['prefix' => 'project', 'middleware' => ['auth']], function () {
     Route::get('/', ['ProjectController@index']);
+    Route::get('/{projectcode}', ['ProjectController@view']);
     Route::get('/create', ['ProjectController@create']);
     Route::post('/save', ['ProjectController@store']);
     Route::get('/view/{id}', ['ProjectController@edit']);

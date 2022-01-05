@@ -62,25 +62,30 @@ require __DIR__ . '/../layouts/head.php'; ?>
         <div class="card-body">
             <div class="row">
 
-                <div class="col-md-3 col-sm-6 col-12">
-                    <div class="info-box bg-secondary">
-                        <!-- <span class="info-box-icon"><i class="far fa-bookmark"></i></span> -->
+                <?php
+                foreach ($projects as $project) :
+                    $percentage = getProjectPercentage(getFinishTask($project['project_code']), getTotalTask($project['project_code']));
+                ?>
+                    <div class="col-md-3 col-sm-6 col-12">
+                        <div class="info-box bg-secondary">
+                            <!-- <span class="info-box-icon"><i class="far fa-bookmark"></i></span> -->
+                            <div class="info-box-content">
+                                <span class="info-box-text"><?= getProjectName($project['project_code'], 'projectName') ?></span>
+                                <span class="info-box-text"><?= $project['project_code'] ?></span>
 
-                        <div class="info-box-content">
-                            <span class="info-box-text">NOTES SERVICE</span>
-                            <span class="info-box-text">J6K5L4BM21</span>
-
-                            <div class="progress">
-                                <div class="progress-bar" style="width: 70%"></div>
+                                <div class="progress" data-toggle='tooltip' data-placement='bottom' data-original-title='<?= $percentage ?>%'>
+                                    <div class="progress-bar" style="width: <?= $percentage ?>%"></div>
+                                </div>
+                                <span class="info-box-text">
+                                    <a href="<?= route('/project/' . $project['project_code']) ?>" class="btn btn-block btn-secondary btn-xs"><i class="fas fa-eye"></i> View Details</a>
+                                </span>
                             </div>
-                            <span class="info-box-text">
-                                <button type="button" class="btn btn-block btn-secondary btn-xs"><i class="fas fa-eye"></i> View Details</button>
-                            </span>
+                            <!-- /.info-box-content -->
                         </div>
-                        <!-- /.info-box-content -->
+                        <!-- /.info-box -->
                     </div>
-                    <!-- /.info-box -->
-                </div>
+
+                <?php endforeach; ?>
 
             </div>
         </div>

@@ -1,3 +1,7 @@
+<a id="back-to-top" href="#" class="btn btn-primary back-to-top" role="button" aria-label="Scroll to top">
+    <i class="fas fa-chevron-up"></i>
+</a>
+
 </div>
 
 <!-- Main Footer -->
@@ -39,22 +43,6 @@
 
 <script type="text/javascript">
     $('.select2').select2();
-
-    function changeBranch() {
-        var selected_branch = $("#current_branch").val();
-
-        page_loader("changing branch");
-        $.post(base_url + "/change-branch", {
-            id: selected_branch
-        }, function(data, status) {
-            if (data == 1) {
-                page_loader_hide();
-                location.reload();
-            } else {
-                failed_query();
-            }
-        });
-    }
 </script>
 </body>
 

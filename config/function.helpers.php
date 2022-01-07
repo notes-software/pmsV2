@@ -31,7 +31,7 @@ function getUserTask($projectCode, $member = '')
 {
 	$userid = Auth::user('id');
 	$withFilter = ($member == "") ? "AND user_id = '$userid'" : "AND user_id = '$member'";
-	$getProject = DB()->selectLoop("*", "task_member", "projectCode = '$projectCode' {$withFilter}")
+	$getTasks = DB()->selectLoop("*", "task_member", "projectCode = '$projectCode' {$withFilter}")
 		->andFilter([
 			"tasks" => "ORDER BY priority_stats DESC , taskDueDate ASC"
 		])
@@ -41,7 +41,7 @@ function getUserTask($projectCode, $member = '')
 		])
 		->get();
 
-	return $getProject;
+	return $getTasks;
 }
 
 function getProjectPercentage($finishTasks, $totalTask)
@@ -100,7 +100,6 @@ function sideAccess($parent)
 					}
 				}
 			}
-
 			return $menus;
 		}
 	}
@@ -127,10 +126,116 @@ function showMenus($sideMenuData)
 			$menus .= '</ul></li>';
 		} else {
 			foreach ($parentData['child'] as $child_name) {
-				$menus .= '<li class="nav-item"><a href="' . route($child_name['route']) . '" class="nav-link ' . isActive($child_name['name']) . '"><i class="nav-icon ' . $parentData['icon'] . '"></i><p>' . $parent . '</p></li>';
+				$menus .= '<li class="nav-item"><a href="' . route($child_name['route']) . '" class="nav-link ' . isActive($child_name['name']) . '"><i class="nav-icon ' . $parentData['icon'] . '"></i><p>' . $parent . '</p></a></li>';
 			}
 		}
 	}
-
 	return $menus;
+}
+
+function log_activity($msg, $module, $user_id, $task_code)
+{
+	$data = array(
+		'log' => $msg,
+		'module' => $module,
+		'date' => date("Y-m-d H:i:s"),
+		'user_id' => $user_id,
+		'task_code' => $task_code
+	);
+	DB()->insert("activity_logs", $data);
+}
+
+function getTaskMember($project_code, $task_id)
+{
+	$loop_task = DB()->selectLoop("*", "task_member", "projectCode = '$project_code' AND task_id = '$task_id'")
+		->with([
+			'users' => ['user_id', 'id']
+		])
+		->get();
+
+	foreach ($loop_task as $task_list) {
+		if (!empty($task_list['users'])) {
+			$_task_list = (!empty($task_list['users'][0]))
+				? $task_list['users'][0]
+				: $task_list['users'];
+
+			$showPic = ($_task_list['slug'] != "")
+				? $_task_list['slug']
+				: 'user_default_avatar.png';
+
+			$task_member_data[] = array(
+				'task_member_id'    => $task_list['user_id'],
+				'member_name'       => $_task_list['fullname'],
+				'member_avatar'     => public_url("/assets/pms/user_avatar/{$showPic}"),
+				'invite_status'     => $task_list['invite_status']
+			);
+		}
+	}
+
+	return $task_member_data;
+}
+
+function allowDeleteTask($project_code, $task_id)
+{
+	$user_id = Auth::user('id');
+	$_task = DB()->select("COUNT(*) as totals", "task_member", "projectCode = '$project_code' AND task_id = '$task_id' AND invite_status = 0 AND user_id = '$user_id'")->get();
+	$allow = ($_task['totals'] > 0) ? 1 : 0;
+	return $allow;
+}
+
+function isProjectManager($projectCode)
+{
+	$isAllowedToViewAll = [
+		1,
+		2
+	];
+
+	$treatRolesAsPm = implode(',', $isAllowedToViewAll);
+	$optin_id = Auth::user('id');
+	$getPM = DB()->select("user_id", "project_member", "projectCode = '$projectCode' AND user_id = '$optin_id' AND role_id IN ($treatRolesAsPm)")->get();
+	if ($getPM['user_id'] > 0) {
+		$result = 1;
+	} else {
+		$result = 0;
+	}
+
+	return $result;
+}
+
+function isProjectTeamLeader($projectCode)
+{
+	$optin_id = Auth::user('id');
+	$getPM = DB()->select("user_id", "project_member", "projectCode = '$projectCode' AND user_id = '$optin_id' AND role_id = '4'")->get();
+	if ($getPM['user_id'] > 0) {
+		$result = 1;
+	} else {
+		$result = 0;
+	}
+
+	return $result;
+}
+
+function getProjectMember($code)
+{
+	$query = DB()->selectLoop("*", "project_member", "projectCode = '$code' AND user_id != 0 GROUP BY user_id")
+		->with([
+			"users" => ['user_id', 'id']
+		])
+		->get();
+	foreach ($query as $getRow) {
+		if (!empty($getRow['users'])) {
+
+			$_task = (!empty($getRow['users'][0]))
+				? $getRow['users'][0]
+				: $getRow['users'];
+
+			$data[] = array(
+				'user_id'   => $getRow['user_id'],
+				'memberName' => $_task['fullname'],
+				'role'      => $getRow['role_id']
+			);
+		}
+	}
+
+	return $data;
 }

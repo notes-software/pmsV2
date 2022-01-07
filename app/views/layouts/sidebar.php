@@ -23,7 +23,7 @@ use App\Core\Request;
 				<?=
 				showMenus([
 					'DASHBOARD' => [
-						'isTree' => false,
+						'isTree' => 0,
 						'icon' => 'fas fa-home',
 						'child' => [
 							'dashboard_access' => [
@@ -34,7 +34,7 @@ use App\Core\Request;
 						]
 					],
 					'REQUEST BOOK' => [
-						'isTree' => false,
+						'isTree' => 0,
 						'icon' => 'fas fa-book',
 						'child' => [
 							'request_book_access' => [
@@ -45,7 +45,7 @@ use App\Core\Request;
 						]
 					],
 					'NOTEBOOK' => [
-						'isTree' => false,
+						'isTree' => 0,
 						'icon' => 'far fa-sticky-note',
 						'child' => [
 							'notebook_access' => [
@@ -56,7 +56,7 @@ use App\Core\Request;
 						]
 					],
 					'PROJECT' => [
-						'isTree' => false,
+						'isTree' => 0,
 						'icon' => 'fas fa-tasks',
 						'child' => [
 							'project_access' => [
@@ -66,76 +66,8 @@ use App\Core\Request;
 							]
 						]
 					],
-					// 'MASTER DATA' => [
-					// 	'isTree' => true,
-					// 	'icon' => 'fas fa-book',
-					// 	'child' => [
-					// 		'branch_access' => [
-					// 			'route' => '/branch',
-					// 			'name' => 'branch',
-					// 			'level' => 0
-					// 		],
-					// 		'employee_access' => [
-					// 			'route' => '/employee',
-					// 			'name' => 'employee',
-					// 			'level' => 1
-					// 		],
-					// 		'product_access' => [
-					// 			'route' => '/product',
-					// 			'name' => 'product',
-					// 			'level' => 2
-					// 		],
-					// 		'supplier_access' => [
-					// 			'route' => '/supplier',
-					// 			'name' => 'supplier',
-					// 			'level' => 3
-					// 		]
-					// 	]
-					// ],
-					// 'TRANSACTIONS' => [
-					// 	'isTree' => true,
-					// 	'icon' => 'far fa-file',
-					// 	'child' => [
-					// 		'purchase_access' => [
-					// 			'route' => '/purchase',
-					// 			'name' => 'purchase',
-					// 			'level' => 0
-					// 		],
-					// 		'receiving_access' => [
-					// 			'route' => '/receiving',
-					// 			'name' => 'receiving',
-					// 			'level' => 1
-					// 		],
-					// 		'repack_access' => [
-					// 			'route' => '/repack',
-					// 			'name' => 'repack',
-					// 			'level' => 2
-					// 		],
-					// 		'sales_access' => [
-					// 			'route' => '/salesTransact',
-					// 			'name' => 'salesTransact',
-					// 			'level' => 3
-					// 		]
-					// 	]
-					// ],
-					// 'REPORT' => [
-					// 	'isTree' => true,
-					// 	'icon' => 'fas fa-print',
-					// 	'child' => [
-					// 		'inventory_report_access' => [
-					// 			'route' => '/report/inventory',
-					// 			'name' => 'inventory',
-					// 			'level' => 0
-					// 		],
-					// 		'sales_report_access' => [
-					// 			'route' => '/report/salesReport',
-					// 			'name' => 'salesReport',
-					// 			'level' => 1
-					// 		]
-					// 	]
-					// ],
 					'SETTINGS' => [
-						'isTree' => true,
+						'isTree' => 1,
 						'icon' => 'fas fa-cog',
 						'child' => [
 							'permission_access' => [

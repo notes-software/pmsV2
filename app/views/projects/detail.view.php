@@ -3,7 +3,11 @@
 use App\Core\Auth;
 use App\Core\Request;
 
-require __DIR__ . '/../layouts/head.php'; ?>
+require __DIR__ . '/../layouts/head.php';
+
+$isProjPm = isProjectManager($project['projectCode']);
+$isProjTl = isProjectTeamLeader($project['projectCode']);
+?>
 
 <style>
     .welcome-msg {
@@ -30,11 +34,13 @@ require __DIR__ . '/../layouts/head.php'; ?>
     }
 
     .droptarget {
-        height: 600px;
+        /* height: 600px; */
     }
 </style>
 
 <!-- Content Header (Page header) -->
+<input type="hidden" id="is_pm" value="<?= $isProjPm ?>">
+<input type="hidden" id="is_tl" value="<?= $isProjTl ?>">
 <input type="hidden" id="has_user_id" value="<?= Auth::user('id') ?>">
 <section class="content-header pb-0">
     <div class="row">
@@ -63,17 +69,20 @@ require __DIR__ . '/../layouts/head.php'; ?>
 
                 <div class="card-tools">
                     <div class="align-left">
-                        <a href="<?= route('/project') ?>" class="btn btn-default btn-sm"><i class="fas fa-arrow-left"></i> Back</a>
+                        <a href="<?= route('/project') ?>" class="btn btn-default btn-sm"><i class="fas fa-arrow-left"></i>&nbsp;</a>
                         <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#create_branch_modal">New Task</button>
                         <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#create_branch_modal">Project settings</button>
                     </div>
                 </div>
 
                 <div class="card-title">
-                    <select class="form-control select2 " name="current_branch" id="current_branch" tabindex="-1" aria-hidden="true">
+                    <select class="form-control-sm select2 " name="myproj-member-selected" id="myproj-member-selected" tabindex="-1" aria-hidden="true" onchange="displayUserTask()">
                         <option value="">-- select member --</option>
-                        <option value="1">Bacolod Store</option>
-                        <option value="2">Murcia Store</option>
+                        <?php
+                        foreach ($projectMembers as $member) {
+                        ?>
+                            <option value="<?= $member['user_id'] ?>"><?= $member['memberName'] ?></option>
+                        <?php } ?>
                     </select>
                 </div>
             </div>
@@ -90,27 +99,12 @@ require __DIR__ . '/../layouts/head.php'; ?>
                                 <div class="card-tools">
                                     <div>
                                         TO DO'S
-                                        <span class="badge badge-secondary navbar-badge">15</span>
+                                        <span class="badge badge-secondary navbar-badge" id="counter-todo"></span>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="card-body p-2 drops droptarget msg_chat_scroll" id="sortable1">
-
-                            <div class="col-md-12 col-sm-12 col-12" id="315">
-                                <div class="row">
-                                    <div class="info-box bg-green">
-                                        <div class="info-box-content">
-                                            <small class="info-box-text"><i class="far fa-calendar-check"></i> Due: 12/14/2020</small>
-                                            <span class="badge navbar-badge" data-toggle='tooltip' data-placement='bottom' data-original-title='Delete task'><i class="far fa-trash-alt" style="font-size: 13px;"></i></span>
-                                            <span class="badge navbar-badge" data-toggle='tooltip' data-placement='bottom' data-original-title='View task' style="right: 30;"><i class="fas fa-eye" style="font-size: 13px;"></i></span>
-                                            <span class="info-box-text">
-                                                <pre class="mt-1" style="white-space: pre-wrap;font-family: 'myFirstFont';font-size: inherit;padding: 0px;color: inherit;background: inherit;background : transparent;">purchase module add if close kag e open liwat wla ga reset ang mga textboxes,it should be reset before openning modal</pre>
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
 
                         </div>
                     </div>
@@ -126,7 +120,7 @@ require __DIR__ . '/../layouts/head.php'; ?>
                                 <div class="card-tools">
                                     <div>
                                         IN PROGRESS
-                                        <span class="badge badge-secondary navbar-badge">15</span>
+                                        <span class="badge badge-secondary navbar-badge" id="counter-inprogress"></span>
                                     </div>
                                 </div>
                             </div>
@@ -139,7 +133,7 @@ require __DIR__ . '/../layouts/head.php'; ?>
 
                 <!-- DONE -->
                 <div class="col-md-4 col-sm-6 col-12">
-                    <div class="card cardDropOffs">
+                    <!-- <div class="card cardDropOffs">
                         <div class="card-header">
                             <div style="display: flex;flex-direction: row;justify-content: space-between;align-items: center;">
 
@@ -153,6 +147,40 @@ require __DIR__ . '/../layouts/head.php'; ?>
                         </div>
                         <div class="card-body p-2 drops droptarget msg_chat_scroll" id="sortable3">
                         </div>
+                    </div> -->
+
+                    <div class="card cardDropOffs">
+                        <div class="card-header pb-0 pt-1">
+                            <div style="display: flex;flex-direction: row;justify-content: space-between;align-items: center;">
+                                <div class="card-tools">DONE</div>
+                                <div class="card-tools">
+                                    <div class="d-flex" style="flex-direction: row;align-items: center;justify-content: space-between;">
+
+                                        <!-- <span class="badge badge-secondary navbar-badge">15</span> -->
+                                        <ul class="nav nav-tabs">
+                                            <li class="nav-item"><a class="nav-link active" href="#todaytab" data-toggle="tab">Today ( <span id="counter-today"></span> )</a></li>
+                                            <li class="nav-item"><a class="nav-link" href="#pasttab" data-toggle="tab">Past ( <span id="counter-done"></span> )</a></li>
+                                        </ul>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div><!-- /.card-header -->
+                        <div class="card-body p-2 drops droptarget msg_chat_scroll" id="sortable3">
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="todaytab">
+                                    <div id="sortable3_today">
+                                    </div>
+                                </div>
+                                <!-- /.tab-pane -->
+                                <div class="tab-pane" id="pasttab">
+                                    <div id="sortable3_all">
+                                    </div>
+                                </div>
+                                <!-- /.tab-pane -->
+                            </div>
+                            <!-- /.tab-content -->
+                        </div><!-- /.card-body -->
                     </div>
                 </div>
                 <!-- END DONE -->
@@ -165,11 +193,14 @@ require __DIR__ . '/../layouts/head.php'; ?>
 </section>
 
 <?php include_once __DIR__ . '/create_request_modal.php'; ?>
-<?php include_once __DIR__ . '/edit_request_modal.php'; ?>
+<?php include_once __DIR__ . '/edit_task_modal.php'; ?>
 
 <script type="text/javascript">
+    var isPM = $("#is_pm").val();
+    var isTL = $("#is_tl").val();
+
     $(function() {
-        draggable_task();
+        displayUserTask();
     });
 
     function editBranch(id) {
@@ -216,10 +247,11 @@ require __DIR__ . '/../layouts/head.php'; ?>
             memberSelected = "";
         }
 
-        $.post(base_url + "/projects/task", {
+        $.post(base_url + "/project/task", {
             project_code: project_code,
             memberSelected: memberSelected
         }, function(data) {
+            console.log(data);
             // $('#user_task_container').html(data);
             var task_data = JSON.parse(data);
             var todo_cloth = "",
@@ -238,34 +270,7 @@ require __DIR__ . '/../layouts/head.php'; ?>
                 for (var td = 0; td < todo_len; ++td) {
                     var todo_list = task_data.todo[td];
 
-                    var todo_task_member = "";
-                    var memTDCounter = 1;
-                    if (todo_list.task_member != null) {
-                        for (var tmem = 0; tmem < todo_list.task_member.length; tmem++) {
-                            var todo_mmbr = todo_list.task_member[tmem];
-                            if (tmem <= 3) {
-                                todo_task_member += "<img src='" + todo_mmbr.member_avatar + "' style='width:20px; height: 20px;object-fit: cover;' class='rounded-circle' data-toggle='tooltip' data-placement='bottom' title='' data-original-title='" + todo_mmbr.member_name + "'>";
-                            } else {
-                                if (memTDCounter == 1) {
-                                    todo_task_member += '<div style="width: 20px;height: 20px;object-fit: cover;font-size: 12px;background-color: #868686 !important;" class="avatar rounded-circle" data-toggle="tooltip" data-placement="bottom" data-original-title="+' + (todo_list.task_member.length - 4) + '"><i class="fas fa-ellipsis-h"></i></div>';
-                                }
-                                memTDCounter++;
-                            }
-                        }
-                    }
-
-                    var todo_prio_stats;
-                    if (todo_list.priority == 0) {
-                        todo_prio_stats = "LOW";
-                    } else if (todo_list.priority == 1) {
-                        todo_prio_stats = "MEDIUM";
-                    } else {
-                        todo_prio_stats = "HIGH";
-                    }
-
-                    var delete_task = (todo_list.allow_delete == 1) ? "<small class='text-muted float-right' onclick='deletetask(" + todo_list.task_id + ")' style='color: red !important; cursor: default;'><a style='color: red;font-size: 12px;' data-toggle='tooltip' data-placement='bottom' data-original-title='Delete task'><i class='far fa-trash-alt'></i></a></small>" : "";
-
-                    todo_cloth += "<div class='ui-state-default card mb-3 c_items' id='" + todo_list.task_id + "' style='font-size: 14px;margin-bottom: 5px !important;cursor: grab;box-shadow: 0 0;'><div class='card-header' style='border-left: 3px solid " + todo_list.priority_color + ";padding: 8px;'><div class='col-12' style='display: flex;flex-direction: row;padding: 0px;justify-content:space-between;'><small class='d-flex' style='flex-direction: row;align-items: center;'><a style='color: green;font-size: 12px;cursor: default;' data-toggle='tooltip' data-placement='bottom' data-original-title='View task' onclick='viewTask(\"" + todo_list.task_id + "\", \"TO DO\")'><i class='fas fa-eye'></i></a><label class='ml-1' style='border: 1px solid #ddd;border-radius: 5px;color: #1d81e8;padding-left: 3px; padding-right: 3px;margin-bottom: 0px;'><b><i class='far fa-calendar-check'></i> " + todo_list.date + "</b></label><div class='ml-1' style='cursor: default;'>" + todo_task_member + "</div></small>" + delete_task + "</div><div class='col-12' style='padding: 0px;'><div class='col-12' style='padding: 0px;'><small>CODE: " + todo_list.task_code + "</small><small class='ml-3'>PRIORITY: <span style='color:" + todo_list.priority_color + ";'>" + todo_prio_stats + "</small></div><pre style='white-space: pre-wrap;font-family: inherit;font-size: 14px;'>" + todo_list.task + "</pre></div></div></div>";
+                    todo_cloth += taskClothe(todo_list);
                 }
             }
             $("#counter-todo").html(todo_len);
@@ -277,34 +282,7 @@ require __DIR__ . '/../layouts/head.php'; ?>
                 for (var td = 0; td < inprog_len; ++td) {
                     var inprog_list = task_data.inprogress[td];
 
-                    var inprog_task_member = "";
-                    var memCounter = 1;
-                    if (inprog_list.task_member != null) {
-                        for (var ipmem = 0; ipmem < inprog_list.task_member.length; ipmem++) {
-                            var inprog_mmbr = inprog_list.task_member[ipmem];
-                            if (ipmem <= 3) {
-                                inprog_task_member += "<img src='" + inprog_mmbr.member_avatar + "' style='width:20px; height: 20px;object-fit: cover;' class='rounded-circle' data-toggle='tooltip' data-placement='bottom' title='' data-original-title='" + inprog_mmbr.member_name + "'>";
-                            } else {
-                                if (memCounter == 1) {
-                                    inprog_task_member += '<div style="width: 20px;height: 20px;object-fit: cover;font-size: 12px;background-color: #868686 !important;" class="avatar rounded-circle" data-toggle="tooltip" data-placement="bottom" data-original-title="+' + (inprog_list.task_member.length - 4) + '"><i class="fas fa-ellipsis-h"></i></div>';
-                                }
-                                memCounter++;
-                            }
-                        }
-                    }
-
-                    var inprog_prio_stats;
-                    if (inprog_list.priority == 0) {
-                        inprog_prio_stats = "LOW";
-                    } else if (inprog_list.priority == 1) {
-                        inprog_prio_stats = "MEDIUM";
-                    } else {
-                        inprog_prio_stats = "HIGH";
-                    }
-
-                    var delete_inprog_task = (inprog_list.allow_delete == 1) ? "<small class='text-muted float-right' onclick='deletetask(" + inprog_list.task_id + ")' style='color: red !important; cursor: default;'><a style='color: red;font-size: 12px;' data-toggle='tooltip' data-placement='bottom' data-original-title='Delete task'><i class='far fa-trash-alt'></i></a></small>" : "";
-
-                    inprog_cloth += "<div class='ui-state-default card mb-3 c_items' id='" + inprog_list.task_id + "' style='font-size: 14px;margin-bottom: 5px !important;cursor: grab;box-shadow: 0 0;'><div class='card-header' style='border-left: 3px solid " + inprog_list.priority_color + ";padding: 8px;'><div class='col-12' style='display: flex;flex-direction: row;padding: 0px;justify-content:space-between;'><small class='d-flex' style='flex-direction: row;align-items: center;'><a style='color: green;font-size: 12px;cursor: default;' data-toggle='tooltip' data-placement='bottom' data-original-title='View task' onclick='viewTask(\"" + inprog_list.task_id + "\", \"IN PROGRESS\")'><i class='fas fa-eye'></i></a><label class='ml-1' style='border: 1px solid #ddd;border-radius: 5px;color: #1d81e8;padding-left: 3px; padding-right: 3px;margin-bottom: 0px;'><b><i class='far fa-calendar-check'></i> " + inprog_list.date + "</b></label><div class='ml-1' style='cursor: default;display: flex;flex-direction: row;'>" + inprog_task_member + "</div></small>" + delete_inprog_task + "</div><div class='col-12' style='padding: 0px;'><div class='col-12' style='padding: 0px;'><small>CODE: " + inprog_list.task_code + "</small><small class='ml-3'>PRIORITY: <span style='color:" + inprog_list.priority_color + ";'>" + inprog_prio_stats + "</small></div><pre style='white-space: pre-wrap;font-family: inherit;font-size: 14px;'>" + inprog_list.task + "</pre></div></div></div>";
+                    inprog_cloth += taskClothe(inprog_list);
                 }
             }
             $('#sortable2').html(inprog_cloth);
@@ -325,41 +303,14 @@ require __DIR__ . '/../layouts/head.php'; ?>
                 for (var td = 0; td < done_len; ++td) {
                     var done_list = task_data.done[td];
 
-                    var done_task_member = "";
-                    var memIPCounter = 1;
-                    if (done_list.task_member != null) {
-                        for (var dmem = 0; dmem < done_list.task_member.length; dmem++) {
-                            var done_mmbr = done_list.task_member[dmem];
-                            if (dmem <= 3) {
-                                done_task_member += "<img src='" + done_mmbr.member_avatar + "' style='width:20px; height: 20px;object-fit: cover;' class='rounded-circle' data-toggle='tooltip' data-placement='bottom' title='' data-original-title='" + done_mmbr.member_name + "'>";
-                            } else {
-                                if (memIPCounter == 1) {
-                                    done_task_member += '<div style="width: 20px;height: 20px;object-fit: cover;font-size: 12px;background-color: #868686 !important;" class="avatar rounded-circle" data-toggle="tooltip" data-placement="bottom" data-original-title="+' + (done_list.task_member.length - 4) + '"><i class="fas fa-ellipsis-h"></i></div>';
-                                }
-                                memIPCounter++;
-                            }
-                        }
-                    }
-
-                    var done_prio_stats;
-                    if (done_list.priority == 0) {
-                        done_prio_stats = "LOW";
-                    } else if (done_list.priority == 1) {
-                        done_prio_stats = "MEDIUM";
-                    } else {
-                        done_prio_stats = "HIGH";
-                    }
-
-
-
                     // console.log(done_list.finishDate + " == " + now);
                     if (done_list.finishDate == now) {
                         console.log(now);
                         count_today++;
-                        done_cloth_today += "<div class='ui-state-default card mb-3 c_items' id='" + done_list.task_id + "' style='font-size: 14px;margin-bottom: 5px !important;box-shadow: 0 0;'><div class='card-header' style='border-left: 3px solid " + done_list.priority_color + ";padding: 8px;'><div class='col-12' style='display: flex;flex-direction: row;padding: 0px;justify-content:space-between;'><small class='d-flex' style='flex-direction: row;align-items: center;'><a style='color: green;font-size: 12px;cursor: default;' data-toggle='tooltip' data-placement='bottom' data-original-title='View task' onclick='viewTask(\"" + done_list.task_id + "\", \"DONE\")'><i class='fas fa-eye'></i></a><label class='ml-1' style='border: 1px solid #ddd;border-radius: 5px;color: #1d81e8;padding-left: 3px; padding-right: 3px;margin-bottom: 0px;'><b><i class='far fa-calendar-check'></i> " + done_list.date + "</b></label><div class='ml-1' style='cursor: default;'>" + done_task_member + "</div></small></div><div class='col-12' style='padding: 0px;'><div class='col-12' style='padding: 0px;'><small>CODE: " + done_list.task_code + "</small><small class='ml-3'>PRIORITY: <span style='color:" + done_list.priority_color + ";'>" + done_prio_stats + "</small></div><pre style='white-space: pre-wrap;font-family: inherit;font-size: 14px;'>" + done_list.task + "</pre></div></div></div>";
+                        done_cloth_today += taskClothe(done_list);
                     } else {
                         count_all++;
-                        done_cloth_all += "<div class='ui-state-default card mb-3 c_items' id='" + done_list.task_id + "' style='font-size: 14px;margin-bottom: 5px !important;box-shadow: 0 0;'><div class='card-header' style='border-left: 3px solid " + done_list.priority_color + ";padding: 8px;'><div class='col-12' style='display: flex;flex-direction: row;padding: 0px;justify-content:space-between;'><small class='d-flex' style='flex-direction: row;align-items: center;'><a style='color: green;font-size: 12px;cursor: default;' data-toggle='tooltip' data-placement='bottom' data-original-title='View task' onclick='viewTask(\"" + done_list.task_id + "\", \"DONE\")'><i class='fas fa-eye'></i></a><label class='ml-1' style='border: 1px solid #ddd;border-radius: 5px;color: #1d81e8;padding-left: 3px; padding-right: 3px;margin-bottom: 0px;'><b><i class='far fa-calendar-check'></i> " + done_list.date + "</b></label><div class='ml-1' style='cursor: default;'>" + done_task_member + "</div></small></div><div class='col-12' style='padding: 0px;'><div class='col-12' style='padding: 0px;'><small>CODE: " + done_list.task_code + "</small><small class='ml-3'>PRIORITY: <span style='color:" + done_list.priority_color + ";'>" + done_prio_stats + "</small></div><pre style='white-space: pre-wrap;font-family: inherit;font-size: 14px;'>" + done_list.task + "</pre></div></div></div>";
+                        done_cloth_all += taskClothe(done_list);
                     }
                 }
             }
@@ -368,6 +319,7 @@ require __DIR__ . '/../layouts/head.php'; ?>
 
             $('#sortable3_all').html(done_cloth_all);
             $("#counter-done").html(count_all);
+
             draggable_task();
         });
     }
@@ -400,15 +352,106 @@ require __DIR__ . '/../layouts/head.php'; ?>
         }
     }
 
+    function taskClothe(list) {
+
+        $deleteOption = (list.allow_delete == 1) ? '<span class="badge navbar-badge" data-toggle="tooltip" data-placement="bottom" data-original-title="Delete task"><i class="far fa-trash-alt" style="font-size: 13px;"></i></span>' : '';
+
+        var task_member = "";
+        var memTDCounter = 1;
+        if (list.task_member != null) {
+            for (var tmem = 0; tmem < list.task_member.length; tmem++) {
+                var mmbr = list.task_member[tmem];
+                if (tmem <= 3) {
+                    task_member += "<img src='" + mmbr.member_avatar + "' style='width:20px; height: 20px;object-fit: cover;' class='rounded-circle' data-toggle='tooltip' data-placement='bottom' title='' data-original-title='" + mmbr.member_name + "'>";
+                } else {
+                    if (memTDCounter == 1) {
+                        task_member += '<div style="width: 20px;height: 20px;object-fit: cover;font-size: 12px;background-color: #868686 !important;" class="avatar rounded-circle" data-toggle="tooltip" data-placement="bottom" data-original-title="' + (list.task_member.length - 4) + '"><i class="fas fa-ellipsis-h"></i></div>';
+                    }
+                    memTDCounter++;
+                }
+            }
+        }
+
+        return '<div class="col-md-12 col-sm-12 col-12" id="' + list.task_id + '"><div class="row"><div class="info-box bg-' + list.priority_color + '"><div class="info-box-content"><div class="mt-1" style="cursor: default;">' + task_member + '</div><small class="info-box-text mt-1"><i class="far fa-calendar-check"></i> Due: ' + list.date + '</small>' + $deleteOption + '<span class="badge navbar-badge" data-toggle="tooltip" data-placement="bottom" data-original-title="View task" style="right: 30;" onclick="viewTask(\'' + list.task_id + '\', \'' + list.module + '\')"><i class="fas fa-eye" style="font-size: 13px;"></i></span><span class="info-box-text"><pre class="mt-1" style="white-space: pre-wrap;font-family: myFirstFont;font-size: inherit;padding: 0px;color: inherit;background: inherit;background : transparent;">' + list.task + '</pre></span></div></div></div></div>';
+    }
+
     function updateType(id, type) {
         var project_code = "<?= $project['projectCode'] ?>";
-        $.post(base_url + "/projects/task/update", {
+        $.post(base_url + "/project/task/update", {
             id: id,
             type: type,
             project_code: project_code
         }, function(data, status) {
             displayUserTask();
             alertMe('Task updated', 'success');
+        });
+    }
+
+    function viewTask(id, type) {
+        // getTaskDetails(id, type);
+        $("#edit_task_modal").modal({
+            show: true,
+            backdrop: 'static',
+            keyboard: false
+        });
+    }
+
+    function getTaskDetails(id, type) {
+        var project_code = "<?= $project['projectCode'] ?>";
+
+        $.post(base_url + "/project/task/detail", {
+            task_id: id,
+            type: type,
+            project_code: project_code
+        }, function(data) {
+            var task_dt = JSON.parse(data);
+            $("#task_v_id").val(id);
+            var task_dt_len = task_dt.task_detail.length;
+            if (task_dt_len > 0) {
+                for (var tdt = 0; tdt < task_dt_len; tdt++) {
+                    var tsk_dt = task_dt.task_detail[tdt];
+
+                    if (tsk_dt.priority == 0) {
+                        $("#task-color").css("color", "green");
+                    } else if (tsk_dt.priority == 1) {
+                        $("#task-color").css("color", "orange");
+                    } else {
+                        $("#task-color").css("color", "red");
+                    }
+
+                    $("#task-search-result").html("");
+                    $("#taskSearchMember").val("");
+
+                    $("#v_task_code").html(tsk_dt.task_code);
+                    $("#v_task_status").html(tsk_dt.task_type);
+                    $("#task_v_date").val(tsk_dt.date);
+                    $("#v_task_prio_status").val(tsk_dt.priority);
+                    $("#v_task_desc").html(tsk_dt.task);
+
+                    var member_list = "";
+                    var member_remove_btn;
+                    var task_mmber_len = tsk_dt.task_member.length;
+
+                    $("#member-count").html(task_mmber_len);
+                    if (task_mmber_len > 0) {
+                        for (var mmbrL = 0; mmbrL < task_mmber_len; mmbrL++) {
+                            var tsk_mem_list = tsk_dt.task_member[mmbrL];
+                            if (tsk_mem_list.invite_status == 1) {
+                                if (tsk_dt.member_remove == 1) {
+                                    member_remove_btn = '<a class="btn btn-link btn-sm" style="color: red;"><i class="far fa-trash-alt" data-toggle="tooltip" data-placement="bottom" data-title="Remove"></i></a>';
+                                } else {
+                                    member_remove_btn = '';
+                                }
+                            } else {
+                                member_remove_btn = '<a class="btn btn-link btn-sm" style="color: green;"><i class="fas fa-seedling" data-toggle="tooltip" data-placement="bottom" data-title="Owner"></i></a>';
+                            }
+
+                            member_list += '<li class="list-group-item ch-padd-hover mb-1" style="display: flex;align-items: center;justify-content: space-between;padding: 5px;border: 0px !important;width: -webkit-fill-available;"><div style="width: 80%;display: flex;justify-content: center;flex-direction: row;align-items: center;align-content: center;padding: 3px 5px 3px 5px;"><a class="avatar rounded-circle" style="width: 35px; height: 30px;"><img src=' + tsk_mem_list.member_avatar + ' style="width: 100%;height: 100%;object-fit: cover;" class="rounded-circle" data-toggle="tooltip" data-placement="left"></a><h4 class="text-muted" style="font-family: myFirstFont;font-size: 1rem;font-weight: 400;text-overflow: ellipsis;white-space: nowrap;overflow: hidden;margin-bottom: 0px;width: -webkit-fill-available;margin-left: 7px;">' + tsk_mem_list.member_name + '</h4></div><div class="col-2"><div style="align-items: baseline;justify-content: flex-end;display: flex;"><span class="badge badge-danger"></span>' + member_remove_btn + '</div></div></li>';
+                        }
+                    }
+                    $("#task_member_bin").html(member_list);
+                }
+            }
         });
     }
 </script>

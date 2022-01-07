@@ -45,6 +45,11 @@ Route::group(['prefix' => 'project', 'middleware' => ['auth']], function () {
     Route::get('/view/{id}', ['ProjectController@edit']);
     Route::post('/update/{id}', ['ProjectController@update']);
     Route::post('/delete', ['ProjectController@destroy']);
+
+    Route::group(['prefix' => '/task', 'middleware' => ['auth']], function () {
+        Route::post('/', ['ProjectController@task']);
+        Route::post('/update', ['ProjectController@updateTaskType']);
+    });
 });
 
 Route::group(['prefix' => 'purchase', 'middleware' => ['auth']], function () {

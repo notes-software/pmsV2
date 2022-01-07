@@ -77,6 +77,18 @@ if (empty($_SESSION['system']['branch_id'])) {
 		.card {
 			border-radius: 10px !important;
 		}
+
+		.bg-green {
+			background-color: #449d58 !important;
+		}
+
+		.bg-red {
+			background-color: #df4050 !important;
+		}
+
+		.bg-orange {
+			background-color: #efa567 !important;
+		}
 	</style>
 
 	<!-- jQuery -->
@@ -93,6 +105,14 @@ if (empty($_SESSION['system']['branch_id'])) {
 
 	<script>
 		const base_url = "<?= App::get('base_url') ?>";
+
+		$(function() {
+			$("body").tooltip({
+				selector: '[data-toggle=tooltip]',
+				container: 'body'
+			});
+		});
+
 		const Toast = Swal.mixin({
 			toast: true,
 			position: 'top-end',
@@ -134,10 +154,6 @@ if (empty($_SESSION['system']['branch_id'])) {
 				title: 'Error executing query.'
 			});
 		}
-
-		$(function() {
-			$('[data-toggle="tooltip"]').tooltip()
-		});
 	</script>
 </head>
 </head>

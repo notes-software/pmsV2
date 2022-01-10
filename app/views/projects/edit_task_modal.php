@@ -1,5 +1,5 @@
 <div class="modal fade" id="edit_task_modal">
-    <div class="modal-dialog modal-xl">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header d-flex" style="flex-direction: row;align-items: center;">
                 <h6 class="modal-title" id="modal-title-default">

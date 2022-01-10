@@ -117,4 +117,172 @@ class ProjectController
 			}
 		}
 	}
+
+	public function taskDetail()
+	{
+		$request = Request::validate('/project/' . $_REQUEST['project_code']);
+		$task_id = $request["task_id"];
+		$type = $request["type"];
+		$response = array();
+
+		$response['task_detail'] = array();
+		$task_q = DB()->selectLoop("*", "tasks", "task_id = '$task_id'")->get();
+		if (count($task_q) > 0) {
+			foreach ($task_q as $taskList) {
+				$task_items = array(
+					"task_id"       => $taskList['task_id'],
+					"priority"      => $taskList['priority_stats'],
+					"date"          => date('Y-m-d', strtotime($taskList['taskDueDate'])),
+					"task_code"     => $taskList['task_code'],
+					"task"          => html_entity_decode($taskList['taskDescription']),
+					"task_type"     => $type,
+					"task_member"   => getTaskMember($taskList['projectCode'], $taskList['task_id']),
+					"member_remove" => allowDeleteTask($taskList['projectCode'], $taskList['task_id'])
+				);
+				array_push($response['task_detail'], $task_items);
+			}
+		}
+
+		echo json_encode($response);
+	}
+
+	public function taskAdd()
+	{
+		$request = Request::validate('/project/' . $_REQUEST['projectCode']);
+
+		$taskDueDate = $request['due_date'];
+		$user_id = Auth::user('id');
+		$taskDescription = $request['taskDescription'];
+		$status = 0;
+		$priority_stats = $request['priority_status'];
+		$projectCode = $request['projectCode'];
+		$date_mins = date('is');
+		$randCode = strtoupper(randChar(4) . $date_mins);
+
+		$data = [
+			'projectCode' => $projectCode,
+			'taskDescription' => $taskDescription,
+			'taskDueDate' => $taskDueDate,
+			'taskCreateDate' => date("Y-m-d H:i:s"),
+			'status' => $status,
+			'priority_stats' => $priority_stats,
+			'task_code' => $randCode
+		];
+
+		$taskID = DB()->insert("tasks", $data, "Y");
+		if ($taskID) {
+			$data = [
+				'projectCode' => $projectCode,
+				'task_id' => $taskID,
+				'user_id' => $user_id
+			];
+			$res = DB()->insert("task_member", $data);
+			echo $res;
+		} else {
+			echo 0;
+		}
+	}
+
+	public function taskUpdate()
+	{
+		$request = Request::validate('/project/' . $_REQUEST['project_code']);
+		$task_code = $request['task_code'];
+
+		$data = array(
+			'taskDescription'    => $request['task_desc'],
+			'taskDueDate'        => date("Y-m-d", strtotime($request['task_due_date'])),
+			'priority_stats'    => $request['task_prio']
+		);
+
+		$res = DB()->update("tasks", $data, "task_code = '$task_code'");
+		echo $res;
+	}
+
+	public function taskDelete()
+	{
+		$request = Request::validate('/project/' . $_REQUEST['project_code']);
+
+		$taskID = $request["id"];
+
+		$res = DB()->delete("tasks", "task_id = '$taskID' AND projectCode = '$request[project_code]'");
+		if ($res) {
+			$reslt = DB()->delete("task_member", "task_id = '$taskID' AND projectCode = '$request[project_code]'");
+			echo $reslt;
+		} else {
+			echo 0;
+		}
+	}
+
+	public function taskSearchMember()
+	{
+		$request = Request::validate('/project/' . $_REQUEST['project_code']);
+		$search_q = $request['search_tq'];
+		$task_code = $request['task_code'];
+		$data = "";
+
+		$task_id = DB()->select("task_id, projectCode", "tasks", "task_code = '$task_code'")->get();
+		if ($search_q != "") {
+			if (strpos($search_q, '@')) {
+				$loop_user = DB()->selectLoop("*", "users", "email LIKE '%$search_q%'")->get();
+				if (count($loop_user) > 0) {
+					foreach ($loop_user as $user_list) {
+						$taskMemberChecker = DB()->select("count(user_id) as number_of_user", "task_member", "task_id = '$task_id[task_id]' AND user_id = '$user_list[id]'")->get();
+						$user_avatar = getUserAvatar($user_list['id']);
+						if ($taskMemberChecker['number_of_user'] < 1) {
+							$data .= '<li class="list-group-item pl-0"><div class="row align-items-center"><div class="col-2"><a href="#" class="avatar rounded-circle" style="width: 40px;height: 40px;"><img src="' . $user_avatar . '" style="width: 100%;height: 100%;object-fit: cover;" class="rounded-circle"></a></div><div class="col-8"><h5 class="text-muted mb-0">' . $user_list['fullname'] . '</h5><small class="text-muted">' . $user_list['email'] . '</small></div><div class="col-2"><div style="align-items: baseline;justify-content: flex-end;display: flex;"><a href="#" class="btn btn-success btn-sm" onclick="inviteMemberToTask(\'' . $user_list['id'] . '\', \'' . $task_id['task_id'] . '\', \'' . $task_id['projectCode'] . '\')">Share</a></div></div></div></li>';
+						} else {
+							$data .= '<li class="list-group-item px-0"><b>' . $user_list['fullname'] . '</b> is already in your task.</li>';
+						}
+					}
+
+					echo $data;
+				}
+			} else {
+				echo 1;
+			}
+		}
+	}
+
+	public function taskInviteMember()
+	{
+		$request = Request::validate('/project/' . $_REQUEST['project_code']);
+
+		$user_id = $request["user_id"];
+		$task_id = $request["task_id"];
+		$project_code = $request["project_code"];
+
+		$isNotExist = DB()->select("count(user_id) as totals", "task_member", "user_id = '$user_id' AND task_id = '$task_id' AND projectCode = '$project_code'")->get();
+		if ($isNotExist['totals'] < 1) {
+
+			$isProjExist = DB()->select("count(*)", "project_member", "user_id = '$user_id' AND projectCode = '$project_code'")->get();
+			if ($isProjExist[0] < 1) {
+				$data = array(
+					'projectCode'    => $project_code,
+					'user_id'        => $user_id
+				);
+				$res = DB()->insert("project_member", $data);
+			}
+
+			$data = array(
+				'projectCode'    => $project_code,
+				'task_id'        => $task_id,
+				'user_id'        => $user_id,
+				'invite_status'    => 1
+			);
+			$res = DB()->insert("task_member", $data);
+			echo $res;
+		} else {
+			echo 2;
+		}
+	}
+
+	public function details($projectCode)
+	{
+		$pageTitle = "Project Settings";
+		$user_id = Auth::user('id');
+
+		$projectDetail = DB()->select('*', 'projects', "projectCode = '$projectCode'")->get();
+
+		return view('/projects/settings/index', compact('pageTitle', 'projectDetail'));
+	}
 }

@@ -56,7 +56,16 @@ require __DIR__ . '/../layouts/head.php'; ?>
                     </div>
                 </div>
 
-                <h3 class="card-title"></h3>
+                <span class="card-title">
+                    <div class="input-group">
+                        <input type="search" class="form-control" placeholder="search your notes">
+                        <div class="input-group-append">
+                            <button type="submit" class="btn btn-lg btn-default">
+                                <i class="fa fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </span>
             </div>
         </div>
         <div class="card-body">

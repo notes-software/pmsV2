@@ -79,15 +79,71 @@ if (empty($_SESSION['system']['branch_id'])) {
 		}
 
 		.bg-green {
-			background-color: #449d58 !important;
+			background-color: #28a745 !important;
 		}
 
 		.bg-red {
-			background-color: #df4050 !important;
+			background-color: #dc3545 !important;
 		}
 
 		.bg-orange {
-			background-color: #efa567 !important;
+			background-color: #ff851b !important;
+		}
+
+		/* 
+        *   CHAT SCROLL
+        */
+		.msg_chat_scroll {
+			overflow: hidden;
+		}
+
+		.msg_chat_scroll::-webkit-scrollbar-track {
+			/* inset 0 0 6px rgba(0,0,0,0.3) */
+			-webkit-box-shadow: transparent;
+			background-color: transparent;
+		}
+
+		.msg_chat_scroll::-webkit-scrollbar {
+			width: 5px;
+			background-color: transparent;
+		}
+
+		.msg_chat_scroll::-webkit-scrollbar-thumb {
+			background-color: #676767;
+			border: 0px solid #555555;
+			border-radius: 4px;
+		}
+
+		.msg_chat_scroll:hover {
+			overflow: auto;
+		}
+
+		/* 
+        *   CHAT SCROLL STEADY
+        */
+		.msg_chat_scroll_steady {
+			overflow: auto;
+		}
+
+		.msg_chat_scroll_steady::-webkit-scrollbar-track {
+			/* inset 0 0 6px rgba(0,0,0,0.3) */
+			-webkit-box-shadow: transparent;
+			background-color: transparent;
+		}
+
+		.msg_chat_scroll_steady::-webkit-scrollbar {
+			width: 5px;
+			background-color: transparent;
+		}
+
+		.msg_chat_scroll_steady::-webkit-scrollbar-thumb {
+			background-color: #676767;
+			border: 0px solid #555555;
+			border-radius: 4px;
+		}
+
+		.msg_chat_scroll_steady:hover {
+			overflow: auto;
 		}
 	</style>
 

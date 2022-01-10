@@ -49,6 +49,24 @@ Route::group(['prefix' => 'project', 'middleware' => ['auth']], function () {
     Route::group(['prefix' => '/task', 'middleware' => ['auth']], function () {
         Route::post('/', ['ProjectController@task']);
         Route::post('/update', ['ProjectController@updateTaskType']);
+        Route::post('/detail', ['ProjectController@taskDetail', 'auth']);
+        Route::post('/update/details', ['ProjectController@taskUpdate']);
+        Route::post('/add', ['ProjectController@taskAdd']);
+        Route::post('/delete', ['ProjectController@taskDelete']);
+        Route::post('/searchmember', ['ProjectController@taskSearchMember']);
+        Route::post('/inviteMember', ['ProjectController@taskInviteMember']);
+    });
+
+    Route::group(['prefix' => '/settings', 'middleware' => ['auth']], function () {
+        Route::get('/{code}', ['ProjectController@details']);
+        Route::post('/update', ['ProjectController@update']);
+        Route::post('/member/delete', ['ProjectController@memberDelete']);
+        Route::post('/members', ['ProjectController@members']);
+        Route::post('/delete', ['ProjectController@delete']);
+        Route::post('/finish', ['ProjectController@finish']);
+        Route::post('/saveInvite', ['ProjectController@saveInvite']);
+        Route::post('/saveGroupInvite', ['ProjectController@saveGroupInvite']);
+        Route::post('/searchPeople', ['ProjectController@searchPeople']);
     });
 });
 

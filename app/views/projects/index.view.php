@@ -99,7 +99,7 @@ require __DIR__ . '/../layouts/head.php'; ?>
 </section>
 
 <?php include_once __DIR__ . '/create_request_modal.php'; ?>
-<?php include_once __DIR__ . '/edit_request_modal.php'; ?>
+<?php include_once __DIR__ . '/edit_task_modal.php'; ?>
 
 <script type="text/javascript">
     $(function() {

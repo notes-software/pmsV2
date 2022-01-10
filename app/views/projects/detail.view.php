@@ -36,6 +36,11 @@ $isProjTl = isProjectTeamLeader($project['projectCode']);
     .droptarget {
         /* height: 600px; */
     }
+
+    .ch-padd-hover:hover {
+        background: #747f8d3d !important;
+        border-radius: 3px;
+    }
 </style>
 
 <!-- Content Header (Page header) -->
@@ -69,9 +74,9 @@ $isProjTl = isProjectTeamLeader($project['projectCode']);
 
                 <div class="card-tools">
                     <div class="align-left">
-                        <a href="<?= route('/project') ?>" class="btn btn-default btn-sm"><i class="fas fa-arrow-left"></i>&nbsp;</a>
-                        <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#create_branch_modal">New Task</button>
-                        <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#create_branch_modal">Project settings</button>
+                        <a href="<?= route('/project') ?>" class="btn btn-default btn-sm" data-toggle="tooltip" data-placement="bottom" data-original-title="Go back"><i class="fas fa-arrow-left p-1"></i></a>
+                        <a href="<?= route('/project/settings', $project['projectCode']) ?>" class="btn btn-default btn-sm" data-toggle="tooltip" data-placement="bottom" data-original-title="Project Settings"><i class="fas fa-cog p-1"></i></a>
+                        <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#add_task_modal">New Task</button>
                     </div>
                 </div>
 
@@ -169,7 +174,7 @@ $isProjTl = isProjectTeamLeader($project['projectCode']);
                         <div class="card-body p-2 drops droptarget msg_chat_scroll" id="sortable3">
                             <div class="tab-content">
                                 <div class="tab-pane active" id="todaytab">
-                                    <div id="sortable3_today">
+                                    <div id="sortable3_today" style="min-height: 150px;">
                                     </div>
                                 </div>
                                 <!-- /.tab-pane -->
@@ -192,8 +197,9 @@ $isProjTl = isProjectTeamLeader($project['projectCode']);
     <!-- /.card -->
 </section>
 
-<?php include_once __DIR__ . '/create_request_modal.php'; ?>
+<?php include_once __DIR__ . '/add_task_modal.view.php'; ?>
 <?php include_once __DIR__ . '/edit_task_modal.php'; ?>
+<?php include_once __DIR__ . '/create_request_modal.php'; ?>
 
 <script type="text/javascript">
     var isPM = $("#is_pm").val();
@@ -251,7 +257,6 @@ $isProjTl = isProjectTeamLeader($project['projectCode']);
             project_code: project_code,
             memberSelected: memberSelected
         }, function(data) {
-            console.log(data);
             // $('#user_task_container').html(data);
             var task_data = JSON.parse(data);
             var todo_cloth = "",
@@ -261,8 +266,6 @@ $isProjTl = isProjectTeamLeader($project['projectCode']);
             var todo_len = 0,
                 inprog_len = 0,
                 done_len = 0;
-
-            console.log(task_data);
 
             // TO DO'S
             var todo_len = (task_data.todo == null) ? 0 : task_data.todo.length;
@@ -305,7 +308,6 @@ $isProjTl = isProjectTeamLeader($project['projectCode']);
 
                     // console.log(done_list.finishDate + " == " + now);
                     if (done_list.finishDate == now) {
-                        console.log(now);
                         count_today++;
                         done_cloth_today += taskClothe(done_list);
                     } else {
@@ -348,13 +350,15 @@ $isProjTl = isProjectTeamLeader($project['projectCode']);
                 }
             });
         } else {
-            alertMe('User session is empty! Please log in again.', 'danger');
+            alertMe('danger', 'User session is empty! Please log in again.');
         }
     }
 
     function taskClothe(list) {
 
-        $deleteOption = (list.allow_delete == 1) ? '<span class="badge navbar-badge" data-toggle="tooltip" data-placement="bottom" data-original-title="Delete task"><i class="far fa-trash-alt" style="font-size: 13px;"></i></span>' : '';
+        $deleteOption = (list.allow_delete == 1) ? '<span class="badge navbar-badge" data-toggle="tooltip" data-placement="bottom" data-original-title="Delete task" onclick="deletetask(\'' + list.task_id + '\')"><i class="far fa-trash-alt" style="font-size: 13px;"></i></span>' : '';
+
+        $viewOption = ($deleteOption == '') ? '5px' : '30';
 
         var task_member = "";
         var memTDCounter = 1;
@@ -362,17 +366,17 @@ $isProjTl = isProjectTeamLeader($project['projectCode']);
             for (var tmem = 0; tmem < list.task_member.length; tmem++) {
                 var mmbr = list.task_member[tmem];
                 if (tmem <= 3) {
-                    task_member += "<img src='" + mmbr.member_avatar + "' style='width:20px; height: 20px;object-fit: cover;' class='rounded-circle' data-toggle='tooltip' data-placement='bottom' title='' data-original-title='" + mmbr.member_name + "'>";
+                    task_member += "<img src='" + mmbr.member_avatar + "' style='width:20px; height: 20px;object-fit: cover;margin-left: 1px;' class='rounded-circle' data-toggle='tooltip' data-placement='bottom' title='' data-original-title='" + mmbr.member_name + "'>";
                 } else {
                     if (memTDCounter == 1) {
-                        task_member += '<div style="width: 20px;height: 20px;object-fit: cover;font-size: 12px;background-color: #868686 !important;" class="avatar rounded-circle" data-toggle="tooltip" data-placement="bottom" data-original-title="' + (list.task_member.length - 4) + '"><i class="fas fa-ellipsis-h"></i></div>';
+                        task_member += '<span class="rounded-circle" style="margin-left: 1px;padding: 2px;font-size: 12px;background-color: #868686 !important;" data-toggle="tooltip" data-placement="bottom" data-original-title="+' + (list.task_member.length - 4) + ' more">+' + (list.task_member.length - 4) + '</span>';
                     }
                     memTDCounter++;
                 }
             }
         }
 
-        return '<div class="col-md-12 col-sm-12 col-12" id="' + list.task_id + '"><div class="row"><div class="info-box bg-' + list.priority_color + '"><div class="info-box-content"><div class="mt-1" style="cursor: default;">' + task_member + '</div><small class="info-box-text mt-1"><i class="far fa-calendar-check"></i> Due: ' + list.date + '</small>' + $deleteOption + '<span class="badge navbar-badge" data-toggle="tooltip" data-placement="bottom" data-original-title="View task" style="right: 30;" onclick="viewTask(\'' + list.task_id + '\', \'' + list.module + '\')"><i class="fas fa-eye" style="font-size: 13px;"></i></span><span class="info-box-text"><pre class="mt-1" style="white-space: pre-wrap;font-family: myFirstFont;font-size: inherit;padding: 0px;color: inherit;background: inherit;background : transparent;">' + list.task + '</pre></span></div></div></div></div>';
+        return '<div class="col-md-12 col-sm-12 col-12" id="' + list.task_id + '"><div class="row"><div class="info-box bg-' + list.priority_color + '"><div class="info-box-content"><div class="mt-1" style="cursor: default;">' + task_member + '</div><div class="d-flex" style="flex-direction: row;justify-content: space-between;"><div><small class="info-box-text mt-1"><i class="far fa-calendar-check"></i> Due: ' + list.date + '</small></div><div><small class="info-box-text mt-1">Code: ' + list.task_code + '</small></div></div>' + $deleteOption + '<span class="badge navbar-badge" data-toggle="tooltip" data-placement="bottom" data-original-title="View task" style="right: ' + $viewOption + ';" onclick="viewTask(\'' + list.task_id + '\', \'' + list.module + '\')"><i class="fas fa-eye" style="font-size: 13px;"></i></span><span class="info-box-text"><pre class="mt-1" style="white-space: pre-wrap;font-family: myFirstFont;font-size: inherit;padding: 0px;color: inherit;background: inherit;background : transparent;">' + list.task + '</pre></span></div></div></div></div>';
     }
 
     function updateType(id, type) {
@@ -383,12 +387,12 @@ $isProjTl = isProjectTeamLeader($project['projectCode']);
             project_code: project_code
         }, function(data, status) {
             displayUserTask();
-            alertMe('Task updated', 'success');
+            alertMe('success', 'Task updated');
         });
     }
 
     function viewTask(id, type) {
-        // getTaskDetails(id, type);
+        getTaskDetails(id, type);
         $("#edit_task_modal").modal({
             show: true,
             backdrop: 'static',
@@ -452,6 +456,123 @@ $isProjTl = isProjectTeamLeader($project['projectCode']);
                     $("#task_member_bin").html(member_list);
                 }
             }
+        });
+    }
+
+    function addNewTask() {
+        var task_date = $("#task_date").val();
+        var task_status = $("#task_status").val();
+        var task_description = $("#task_description").html();
+        var project_code = "<?= $project['projectCode'] ?>";
+        if (project_code == '') {
+            alertMe('danger', 'No project selected!');
+        } else {
+            if (task_status == '' || task_description == '') {
+                alertMe("warning", "Some of the fields is blank, please fill in the fields.");
+            } else {
+                $.post(base_url + "/project/task/add", {
+                    due_date: task_date,
+                    taskDescription: task_description,
+                    priority_status: task_status,
+                    projectCode: project_code
+                }, function(data, status) {
+                    if (data == 1) {
+                        alertMe('success', 'Successfully Saved!');
+                        $("#task_description").val('');
+                    } else {
+                        alertMe('danger', 'Error saving!');
+                    }
+                    displayUserTask();
+                    //$("#modal-add-task").modal('hide');
+                });
+            }
+        }
+    }
+
+    function save_task_details() {
+        var project_code = "<?= $project['projectCode'] ?>";
+        var task_desc = $("#v_task_desc").html();
+        var task_due_date = $("#task_v_date").val();
+        var task_code = $("#v_task_code").html();
+        var task_prio = $("#v_task_prio_status").val();
+        $.post(base_url + "/project/task/update/details", {
+            task_desc: task_desc,
+            task_due_date: task_due_date,
+            task_code: task_code,
+            task_prio: task_prio,
+            project_code: project_code
+        }, function(data) {
+            if (data == 1) {
+                alertMe("success", "Task updated");
+            } else {
+                alertMe("danger", "Something went wrong!");
+            }
+
+            displayUserTask();
+            var task_id = $("#task_v_id").val();
+            var task_type = $("#v_task_status").html();
+            getTaskDetails(task_id, task_type);
+        });
+    }
+
+    function deletetask(id) {
+        var result = confirm("Are you sure you want to delete task?");
+        if (result) {
+            var project_code = "<?= $project['projectCode'] ?>";
+            $.post(base_url + "/project/task/delete", {
+                id: id,
+                project_code: project_code
+            }, function(data, status) {
+                if (data == 1) {
+                    alertMe("success", "Task deleted!");
+                } else {
+                    alertMe("danger", "Something went wrong!");
+                }
+                displayUserTask();
+            });
+        }
+    }
+
+    $('#taskSearchMember').on('keypress', function(e) {
+        if (e.keyCode == 13) {
+            taskSearchMember();
+        }
+        $('#taskSearchMember').focus();
+    });
+
+    function taskSearchMember() {
+        var project_code = "<?= $project['projectCode'] ?>";
+        var search_tq = $("#taskSearchMember").val();
+        var task_code = $("#v_task_code").html();
+        $.post(base_url + "/project/task/searchmember", {
+            search_tq: search_tq,
+            task_code: task_code,
+            project_code: project_code
+        }, function(data) {
+            if (data != 1) {
+                $("#task-search-result").html(data);
+            } else {
+                alertMe("danger", "Please enter a valid email address.");
+            }
+        });
+    }
+
+    function inviteMemberToTask(user_id, task_id, project_code) {
+        $.post(base_url + "/project/task/inviteMember", {
+            user_id: user_id,
+            task_id: task_id,
+            project_code: project_code
+        }, function(data) {
+            if (data == 1) {
+                alertMe("success", "Task shared");
+            } else if (data == 2) {
+                alertMe("warning", "Already exist in task.");
+            } else {
+                alertMe("danger", "Something went wrong");
+            }
+            var type = $("#v_task_status").html();
+            getTaskDetails(task_id, type);
+            displayUserTask();
         });
     }
 </script>

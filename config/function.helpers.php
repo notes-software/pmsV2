@@ -47,7 +47,7 @@ function getUserTask($projectCode, $member = '')
 function getProjectPercentage($finishTasks, $totalTask)
 {
 	$percent = ($totalTask != 0) ? ($finishTasks / $totalTask) * 100 : 0;
-	return $percent;
+	return number_format($percent, 2);
 }
 
 function isActive($uri)
@@ -238,4 +238,11 @@ function getProjectMember($code)
 	}
 
 	return $data;
+}
+
+function getUserAvatar($user_id)
+{
+	$res = DB()->select("slug", "users", "id = '$user_id'")->get();
+	$showPic = ($res['slug'] != "") ? $res['slug'] : 'user_default_avatar.png';
+	return public_url("/assets/pms/user_avatar/{$showPic}");
 }

@@ -195,8 +195,13 @@ function isProjectManager($projectCode)
 	$treatRolesAsPm = implode(',', $isAllowedToViewAll);
 	$optin_id = Auth::user('id');
 	$getPM = DB()->select("user_id", "project_member", "projectCode = '$projectCode' AND user_id = '$optin_id' AND role_id IN ($treatRolesAsPm)")->get();
-	if ($getPM['user_id'] > 0) {
-		$result = 1;
+
+	if (!empty($getPM)) {
+		if ($getPM['user_id'] > 0) {
+			$result = 1;
+		} else {
+			$result = 0;
+		}
 	} else {
 		$result = 0;
 	}
@@ -208,8 +213,13 @@ function isProjectTeamLeader($projectCode)
 {
 	$optin_id = Auth::user('id');
 	$getPM = DB()->select("user_id", "project_member", "projectCode = '$projectCode' AND user_id = '$optin_id' AND role_id = '4'")->get();
-	if ($getPM['user_id'] > 0) {
-		$result = 1;
+
+	if (!empty($getPM)) {
+		if ($getPM['user_id'] > 0) {
+			$result = 1;
+		} else {
+			$result = 0;
+		}
 	} else {
 		$result = 0;
 	}
@@ -270,7 +280,7 @@ function getMyGroups($user_id)
 function getUserName($userID)
 {
 	$getUserName = DB()->select("fullname", "users", "id = '$userID'")->get();
-	return $getUserName['fullname'];
+	return (!empty($getUserName)) ? $getUserName['fullname'] : '';
 }
 
 function dueDateForthisWeek()

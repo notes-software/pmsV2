@@ -45,16 +45,16 @@
         },
         {
             "name": "sprnva/framework",
-            "version": "v1.3.33",
+            "version": "v1.3.35",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sprnva/framework.git",
-                "reference": "852ccc9c9a5b7d62ffdff9e3bf22111431fe5acd"
+                "reference": "5e8354b8b729cd9924bcfaa33f9f0538006af338"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sprnva/framework/zipball/852ccc9c9a5b7d62ffdff9e3bf22111431fe5acd",
-                "reference": "852ccc9c9a5b7d62ffdff9e3bf22111431fe5acd",
+                "url": "https://api.github.com/repos/sprnva/framework/zipball/5e8354b8b729cd9924bcfaa33f9f0538006af338",
+                "reference": "5e8354b8b729cd9924bcfaa33f9f0538006af338",
                 "shasum": ""
             },
             "type": "library",
@@ -82,9 +82,9 @@
             ],
             "support": {
                 "issues": "https://github.com/sprnva/framework/issues",
-                "source": "https://github.com/sprnva/framework/tree/v1.3.33"
+                "source": "https://github.com/sprnva/framework/tree/v1.3.35"
             },
-            "time": "2021-12-02T01:19:51+00:00"
+            "time": "2022-01-06T03:34:00+00:00"
         }
     ],
     "packages-dev": [],

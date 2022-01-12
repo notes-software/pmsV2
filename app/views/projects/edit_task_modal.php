@@ -41,14 +41,14 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-12">
-                                <a href="#" class="btn btn-primary btn-sm float-right" onclick="save_task_details()">Save Changes</a>
+                            <div class="col-12" id="saveChangesBtn">
+
                             </div>
                         </div>
                     </div>
                     <div class="col-md-4 msg_chat_scroll_steady" style="max-height: 365px;">
 
-                        <div class="col-12">
+                        <div class="col-12" id="shareTaskBin">
                             <center><small>— share task to —</small></center>
                             <div class="form-group">
                                 <input type="text" id="taskSearchMember" class="form-control" placeholder="enter e-mail of user" autocomplete="off">

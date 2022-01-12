@@ -52,15 +52,15 @@ require __DIR__ . '/../layouts/head.php'; ?>
 
                 <div class="card-tools">
                     <div class="align-left">
-                        <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#create_branch_modal">Add note</button>
+                        <button type="button" class="btn btn-default btn-sm" onclick="addNote()">Add note</button>
                     </div>
                 </div>
 
                 <span class="card-title">
                     <div class="input-group">
-                        <input type="search" class="form-control" placeholder="search your notes">
+                        <input type="search" class="form-control" id="notes_search_input" placeholder="search your notes" onkeyup="searchInNotes()">
                         <div class="input-group-append">
-                            <button type="submit" class="btn btn-lg btn-default">
+                            <button type="submit" class="btn btn-lg btn-default" onclick="searchInNotes()">
                                 <i class="fa fa-search"></i>
                             </button>
                         </div>
@@ -70,52 +70,6 @@ require __DIR__ . '/../layouts/head.php'; ?>
         </div>
         <div class="card-body">
             <div class="card-columns" id="note_container">
-
-                <div class="card cardNote">
-                    <div class="card-body">
-                        <textarea class="card-title note-title" rows="1" placeholder="Title" maxlength="999" dir="ltr" style="height: 20px;font-size: 14px; font-style: bolder; font-family: inherit;margin-bottom: 0px;" id="update_note_title_47">git pull using .sh</textarea>
-
-                        <div class="card-text note-content mb-2" rows="1" contenteditable="true" placeholder="Take a note…" maxlength="19999" dir="ltr" style="font-size: 12px; font-family: inherit;white-space: pre-wrap;-webkit-user-modify: read-write-plaintext-only;" id="update_note_content_47">https://gist.github.com/fahim0173/6545d76cc0b5b80d9d8e76fb3a60cd1d</div>
-
-                        <div style="display: flex;flex-direction: row;justify-content: space-between;"><a href="#" onclick="updateNote(47)" style="font-size: 12px;">Done</a><a href="#" onclick="deleteNote('47')" style="color: red;font-size: 12px;" title="delete note"><i class="far fa-trash-alt"></i></a>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card cardNote">
-                    <div class="card-body">
-                        <textarea class="card-title note-title" rows="1" placeholder="Title" maxlength="999" dir="ltr" style="height: 20px;font-size: 14px; font-style: bolder; font-family: inherit;margin-bottom: 0px;" id="update_note_title_43">GITLAB MARKDOWN</textarea>
-
-                        <div class="card-text note-content mb-2" rows="1" contenteditable="true" placeholder="Take a note…" maxlength="19999" dir="ltr" style="font-size: 12px; font-family: inherit;white-space: pre-wrap;-webkit-user-modify: read-write-plaintext-only;" id="update_note_content_43">https://docs.gitlab.com/ee/user/markdown.html</div>
-
-                        <div style="display: flex;flex-direction: row;justify-content: space-between;"><a href="#" onclick="updateNote(43)" style="font-size: 12px;">Done</a><a href="#" onclick="deleteNote('43')" style="color: red;font-size: 12px;" title="delete note"><i class="far fa-trash-alt"></i></a>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card cardNote">
-                    <div class="card-body">
-                        <textarea class="card-title note-title" rows="1" placeholder="Title" maxlength="999" dir="ltr" style="height: 20px;font-size: 14px; font-style: bolder; font-family: inherit;margin-bottom: 0px;" id="update_note_title_35">REACT-NATIVE COMMAND</textarea>
-
-                        <div class="card-text note-content mb-2" rows="1" contenteditable="true" placeholder="Take a note…" maxlength="19999" dir="ltr" style="font-size: 12px; font-family: inherit;white-space: pre-wrap;-webkit-user-modify: read-write-plaintext-only;" id="update_note_content_35">install node_modules
-                            npm install
-
-                            create new project
-                            npx react-native init &lt;project name&gt;
-
-                            start metro
-                            npx react-native start
-
-                            run android
-                            npx react-native run-android
-
-                            run IOS
-                            npx react-native run-ios</div>
-
-                        <div style="display: flex;flex-direction: row;justify-content: space-between;"><a href="#" onclick="updateNote(35)" style="font-size: 12px;">Done</a><a href="#" onclick="deleteNote('35')" style="color: red;font-size: 12px;" title="delete note"><i class="far fa-trash-alt"></i></a>
-                        </div>
-                    </div>
-                </div>
 
             </div>
         </div>
@@ -133,42 +87,90 @@ require __DIR__ . '/../layouts/head.php'; ?>
 
 <script type="text/javascript">
     $(function() {
-        $("#branch_tbl").DataTable();
+        getUserNote();
     });
 
-    function editBranch(id) {
-        $.post(base_url + "/branch/view/" + id, {}, function(data) {
-            var branch = JSON.parse(data);
-            $("#u_branch_name").val(branch.name);
-            $("#u_branch_id").val(branch.id);
-            $("#edit_branch_modal").modal('show');
+    function addNote() {
+        $.post(base_url + "/notebook/new", {}, function(data, status) {
+            $("#note_container").prepend(data);
+            $("#note_title").focus();
         });
     }
 
-    function deleteBranch() {
-        var checkedValues = $('input:checkbox:checked').map(function() {
-            return this.value;
-        }).get();
-
-        id = [];
-        if (checkedValues == "") {
-            alertMe("Aw Snap!", "No Selected Branch", "warning");
-        } else {
-            var retVal = confirm("Are you sure to delete?");
-            if (retVal) {
-                $("#delete_branch_btn").prop('disabled', true);
-                $("#delete_branch_btn").html("<span class='fa fa-spin fa-spinner'></span> Loading ...");
-
-                $.post(base_url + "/branch/delete", {
-                    id: checkedValues
-                }, function(data) {
-                    $("#delete_branch_btn").prop('disabled', true);
-                    $("#delete_branch_btn").html("Delete selected branch");
-
-                    location.reload();
-                });
+    function saveNote() {
+        var title = $("#note_title").val();
+        var content = $("#note_content").html();
+        $.post(base_url + "/notebook/save", {
+            title: title,
+            content: content
+        }, function(data, status) {
+            if (data == 1) {
+                alertMe('success', 'Note saved.');
+            } else {
+                alertMe('danger', 'Error in saving your note.');
             }
+            getUserNote();
+        });
+    }
+
+    function searchInNotes() {
+        var search_q = $("#notes_search_input").val();
+        if (search_q != "") {
+            $.post(base_url + "/notebook/search", {
+                search_q: search_q
+            }, function(data) {
+                $("#note_container").html(data);
+            });
+        } else {
+            getUserNote();
         }
+    }
+
+    function deleteNote(id) {
+        var res = confirm("Are you sure you want to delete this note?");
+        if (res) {
+            $.post(base_url + "/notebook/delete", {
+                id: id
+            }, function(data) {
+                if (data == 1) {
+                    getUserNote();
+                    alertMe("success", "Note deleted");
+                } else {
+                    alertMe("danger", "Error in deleting notes!");
+                }
+            });
+        }
+    }
+
+    function getUserNote() {
+        $.post(base_url + "/notebook/datas", {}, function(data) {
+            $("#note_container").html(data);
+        });
+    }
+
+    function updateNote(note_id) {
+        var title = $("#update_note_title_" + note_id).val();
+        var content = $("#update_note_content_" + note_id).html();
+        $.post(base_url +
+            "/notebook/update", {
+                title: title,
+                content: content,
+                id: note_id
+            },
+            function(data, status) {
+                if (data == 1) {
+                    alertMe('success', 'Note updated.');
+                } else {
+                    alertMe('danger', 'Error in updating your note.');
+                }
+
+                $('[data-toggle="tooltip"]').tooltip('hide');
+                getUserNote();
+            });
+    }
+
+    function cancelNote() {
+        getUserNote();
     }
 </script>
 

@@ -14,9 +14,40 @@ class ProjectController
 		$pageTitle = "Projects";
 		$user_id = Auth::user('id');
 
-		$projects = DB()->selectLoop("t1.CODE as project_code", "(SELECT pm.projectCode AS CODE FROM project_member AS pm, team_member AS tm WHERE pm.teamCode = tm.teamCode AND tm.user_id = '$user_id' AND pm.type = 1 GROUP BY pm.projectCode UNION ALL SELECT pjm.projectCode AS CODE FROM project_member AS pjm, projects AS p WHERE p.projectCode = pjm.projectCode AND pjm.user_id = '$user_id' AND pjm.type = 0 AND p.status = 0 UNION ALL SELECT prj.projectCode as CODE FROM projects as prj WHERE prj.proj_pm = '$user_id' AND prj.status = 0) AS t1", "t1.CODE != '' GROUP BY t1.CODE")->get();
+		$projects = DB()->selectLoop("t1.CODE as project_code", "(SELECT pm.projectCode AS CODE FROM project_member AS pm, team_member AS tm WHERE pm.teamCode = tm.teamCode AND tm.user_id = '$user_id' AND pm.type = 1 GROUP BY pm.projectCode UNION ALL SELECT pjm.projectCode AS CODE FROM project_member AS pjm, projects AS p WHERE p.projectCode = pjm.projectCode AND pjm.user_id = '$user_id' AND pjm.type = 0 UNION ALL SELECT prj.projectCode as CODE FROM projects as prj WHERE prj.proj_pm = '$user_id') AS t1", "t1.CODE != '' GROUP BY t1.CODE")
+			->with([
+				'projects' => ['project_code', 'projectCode']
+			])
+			->get();
 
 		return view('/projects/index', compact('pageTitle', 'projects'));
+	}
+
+	public function store()
+	{
+		$request = Request::validate('/project');
+
+		$user_id = Auth::user('id');
+		$project_name = $request['project_name'];
+		$project_description = $request['project_description'];
+		$projectCode = randChar(10);
+
+		$data = array(
+			'projectCode' => $projectCode,
+			'projectName' => $project_name,
+			'projectDescription' => $project_description,
+			'proj_pm' => $user_id
+		);
+		$result = DB()->insert("projects", $data);
+
+		$memberData = [
+			'projectCode' => $projectCode,
+			'user_id' => $user_id,
+			'role_id' => 2
+		];
+		DB()->insert("project_member", $memberData);
+
+		echo $result;
 	}
 
 	public function view($projectCode)
@@ -284,5 +315,281 @@ class ProjectController
 		$projectDetail = DB()->select('*', 'projects', "projectCode = '$projectCode'")->get();
 
 		return view('/projects/settings/index', compact('pageTitle', 'projectDetail'));
+	}
+
+	public function members()
+	{
+		$request = Request::validate('/project/settings/' . $_REQUEST['projCode']);
+		$proj_name = $request['proj_name'];
+		$projCode = $request['projCode'];
+		$proj_stats = $request['proj_stats'];
+		$response = array();
+
+		$response['proj_member'] = array();
+
+		$loop_mem = getProjectMember($projCode);
+		if (count($loop_mem) < 1) {
+			echo "invite member to this project";
+		} else {
+			foreach ($loop_mem as $memList) {
+				$user_avatar = getUserAvatar($memList['user_id']);
+
+				$members = array(
+					"id" => $memList['user_id'],
+					"name" => $memList["memberName"],
+					"avatar" => $user_avatar,
+				);
+				array_push($response['proj_member'], $members);
+			}
+		}
+
+		echo json_encode($response);
+	}
+
+	public function memberDelete()
+	{
+		$request = Request::validate('/project/settings/' . $_REQUEST['projCode']);
+
+		$projectCode = $request["projCode"];
+		$member_id = $request["id"];
+		$test = $this->deleteProjectMember($projectCode, "", $member_id, 0);
+		echo $test;
+	}
+
+	public function deleteProjectMember($projectCode, $teamCode, $member_id, $type)
+	{
+		if ($type == 1) {
+			// GROUP MEMBER
+			$loop_group_in_project = $this->getMemberInTeam($teamCode);
+			if (count($loop_group_in_project) > 0) {
+				foreach ($loop_group_in_project as $groupList) {
+					$isInGroup = $this->checkIFuserIsInGroup($projectCode, $groupList['user_id'], $teamCode);
+					$isInmember = $this->checkIFuserIsInMember($projectCode, $groupList['user_id']);
+					$delProjectMember = DB()->delete("project_member", "teamCode = '$teamCode' AND projectCode = '$projectCode' AND type = 1");
+					if ($delProjectMember) {
+						if ($isInGroup == 1) {
+							// echo $groupList[user_id]." IF equals: do not delete task!<br><br>";
+						} else {
+							if ($isInmember == 1) {
+								// echo $groupList[user_id]." IF equals: do not delete task!<br><br>";
+							} else {
+								$this->deleteUserTask($groupList['user_id'], $projectCode);
+							}
+						}
+					}
+				}
+			}
+		} else {
+			$isInGroup = $this->checkIFuserIsInGroup($projectCode, $member_id);
+			$isInmember = $this->checkIFuserIsInMember($projectCode, $member_id);
+			$delProjectMember = DB()->delete("project_member", "user_id = '$member_id' AND projectCode = '$projectCode' AND type = 0");
+			if ($delProjectMember) {
+				if ($isInGroup == 1) {
+					// echo $member_id." IF equals: do not delete task!<br><br>";
+				} else {
+					if ($isInmember == 1) {
+						// echo $member_id." IF not: delete task!<br>";
+						$this->deleteUserTask($member_id, $projectCode);
+					} else {
+						// echo $member_id." IF equals: do not delete task!<br><br>";
+					}
+				}
+			}
+		}
+	}
+
+	public function getMemberInTeam($teamCode)
+	{
+		$tm_data = DB()->selectLoop("*", "team_member", "teamCode = '$teamCode'")->get();
+		if (count($tm_data) > 0) {
+			foreach ($tm_data as $tm_list) {
+				$data[] = array(
+					'teamCode'   => $tm_list['teamCode'],
+					'user_id'    => $tm_list['user_id'],
+					'role_id'    => $tm_list['role_id']
+				);
+			}
+			return $data;
+		}
+	}
+
+	public function checkIFuserIsInMember($projectCode, $deleted_user)
+	{
+
+		$member = DB()->select("count(user_id) as  total_users", "project_member", "user_id = '$deleted_user' AND projectCode = '$projectCode' AND type = 0")->get();
+
+		if ($member['total_users'] > 0) {
+			return 1;
+		} else {
+			return 0;
+		}
+	}
+
+	public function checkIFuserIsInGroup($projectCode, $deleted_user, $deleted_teamCode = "")
+	{
+		$data = 0;
+		$t_params = ($deleted_teamCode == "") ? "AND `type` = 1" : "AND teamCode != '$deleted_teamCode' AND `type` = 1";
+		$loopRemainingGroup = DB()->selectLoop("teamCode", "project_member", "projectCode = '$projectCode' $t_params")->get();
+		foreach ($loopRemainingGroup as $rm_list) {
+
+			$Group = DB()->select("count(user_id) as total_user", "team_member", "teamCode = '$rm_list[teamCode]' AND user_id = '$deleted_user'")->get();
+			if ($Group['total_user'] > 0) {
+				$data += 1;
+			} else {
+				$data = 0;
+			}
+		}
+
+		if ($data > 0) {
+			return 1;
+		} else {
+			return 0;
+		}
+	}
+
+	public function deleteUserTask($member_id, $projectCode)
+	{
+		$getTaskData = DB()->selectLoop("task_id", "task_member", "user_id = '$member_id' AND projectCode = '$projectCode'")->get();
+		if (count($getTaskData) > 0) {
+			foreach ($getTaskData as $taskList) {
+				DB()->delete("tasks", "task_id = '$taskList[task_id]'");
+			}
+		}
+
+		$reslt = DB()->delete("task_member", "user_id = '$member_id' AND projectCode = '$projectCode'");
+		echo $reslt;
+	}
+
+	public function delete()
+	{
+		$request = Request::validate('/project/settings/' . $_REQUEST['projCode']);
+		$projectCode = $request['projCode'];
+
+		$this->remove($projectCode);
+	}
+
+	public function remove($projectCode)
+	{
+		// PROJECT
+		$res = DB()->delete("projects", "projectCode = '$projectCode'");
+		if ($res) {
+			// PROJECT MEMBER
+			DB()->delete("project_member", "projectCode = '$projectCode'");
+			// TASK
+			DB()->delete("tasks", "projectCode = '$projectCode'");
+			// TASK MEMBER
+			DB()->delete("task_member", "projectCode = '$projectCode'");
+		}
+	}
+
+	public function finish()
+	{
+		// close a project
+
+		$request = Request::validate('/project/settings/' . $_REQUEST['projectCode']);
+
+		$projectCode = $request['projectCode'];
+
+		$data = array(
+			'status' => 1
+		);
+
+		DB()->update("projects", $data, "projectCode = '$projectCode'");
+		redirect('/project/settings/' . $projectCode);
+	}
+
+	public function saveInvite()
+	{
+		$request = Request::validate('/project/settings/' . $_REQUEST['projCode']);
+		$projectCode = $request['projCode'];
+		$inviteID = $request['id'];
+
+		$data = array(
+			'projectCode' => $projectCode,
+			'user_id' => $inviteID,
+			'type' => 0
+		);
+
+		$res = DB()->insert("project_member", $data);
+		echo $res;
+	}
+
+	public function saveGroupInvite()
+	{
+		$request = Request::validate('/project/settings/' . $_REQUEST['projCode']);
+		$selected_group = $request['selected_group'];
+		$projCode = $request['projCode'];
+
+		$errors = [];
+		$loopTeamMember = DB()->selectLoop("user_id", "team_member", "teamCode = '$selected_group'")->get();
+		foreach ($loopTeamMember as $member) {
+			$res = DB()->select("COUNT(user_id) as total_user", "project_member", "teamCode = '$selected_group' AND projectCode = '$projCode' AND user_id = '$member[user_id]'")->get();
+			if ($res['total_user'] > 0) {
+				$errors[] = [
+					"type" => 2,
+					"msg" => getUserName($member['user_id']) . " is already in this project."
+				];
+			} else {
+				$data = array(
+					'projectCode' => $projCode,
+					'teamCode' => $selected_group,
+					'user_id' => $member['user_id'],
+					'type' => 0
+				);
+				$reslt = DB()->insert("project_member", $data);
+				$errors[] = [
+					"type" => $reslt,
+					"msg" => ""
+				];
+			}
+		}
+
+		echo json_encode($errors);
+	}
+
+	public function searchPeople()
+	{
+		$request = Request::validate('/project/settings/' . $_REQUEST['project_code']);
+
+		$search_q = $request['search_q'];
+		$projectCode = $request['project_code'];
+		if ($search_q != "") {
+			if (strpos($search_q, '@')) {
+				$loop_user = DB()->selectLoop("*", "users", "email LIKE '%$search_q%'")->get();
+				if (count($loop_user) > 0) {
+					$data = "";
+					foreach ($loop_user as $user_list) {
+						$projMemberChecker = DB()->select("count(user_id) as total_user", "project_member", "projectCode = '$projectCode' AND user_id = '$user_list[id]' AND type = 0")->get();
+						$user_avatar = getUserAvatar($user_list['id']);
+						if ($projMemberChecker['total_user'] < 1) {
+							$data .= '<li class="list-group-item px-0 pb-0"><div class="row align-items-center"><div class="col-md-2 pr-0"><a href="#" class="avatar rounded-circle" style="width: 40px;height: 40px;"><img src="' . $user_avatar . '" style="width: 100%;height: 100%;object-fit: cover;" class="rounded-circle"></a></div><div class="col pl-2"><h5 class="text-muted mb-0">' . $user_list['fullname'] . '</h5><small class="text-muted">' . $user_list['email'] . '</small></div><div class="col-md-1"><div style="align-items: baseline;justify-content: flex-end;display: flex;"><a href="#" class="btn btn-success btn-sm" onclick="invitePeopleToProject(\'' . $user_list['id'] . '\')">invite</a></div></div></div></li>';
+						} else {
+							$data .= '<li class="list-group-item px-0 pb-0"><b>' . $user_list['fullname'] . '</b> is already in your project.</li>';
+						}
+					}
+
+					echo $data;
+				}
+			} else {
+				echo 1;
+			}
+		}
+	}
+
+	public function update()
+	{
+		$request = Request::validate('/project/settings/' . $_REQUEST['code']);
+
+		$name = $request['name'];
+		$description = $request['description'];
+		$code = $request['code'];
+
+		$data = array(
+			'projectName' => $name,
+			'projectDescription' => $description
+		);
+
+		$res = DB()->update("projects", $data, "projectCode = '$code'");
+		echo $res;
 	}
 }

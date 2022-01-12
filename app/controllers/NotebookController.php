@@ -3,6 +3,8 @@
 namespace App\Controllers;
 
 use App\Core\Request;
+use App\Core\Auth;
+use PDO;
 
 class NotebookController
 {
@@ -17,61 +19,112 @@ class NotebookController
 		return view('/notebook/index', compact('pageTitle', 'requests'));
 	}
 
-	public function store()
+	public function add()
 	{
-		abort_if(gate_denies('branch_create'), '403 Forbidden');
-
-		$request = Request::validate('/branch', [
-			'branch_name' => ['required']
-		]);
-
-		DB()->insert("branch", [
-			"name" => $request['branch_name'],
-			"status" => 0
-		]);
-
-		return redirect('/branch', ["message" => "Added successfully."]);
+		echo '<div class="card cardNote"><div class="card-body" id="crd_bdy"><textarea class="card-title note-title" rows="1" placeholder="Title" maxlength="999" dir="ltr" style="height: 20px;font-size: 14px; font-style: bolder; font-family: inherit;margin-bottom: 0px;" id="note_title"></textarea><div class="card-text note-content mb-2" rows="1" contenteditable="true" placeholder="Take a note…" maxlength="19999" dir="ltr" style="font-size: 12px; font-family: inherit;white-space: pre-wrap;-webkit-user-modify: read-write-plaintext-only;outline: none;" id="note_content" data-text="content here..."></div><span class="badge navbar-badge" title="Cancel" onclick="cancelNote()" style="right: 15px !important;"><i class="fas fa-ban" style="color: red;font-size: 12px;"></i></span><span class="badge navbar-badge" title="Save Changes" style="right: 35;" onclick="saveNote()"><i class="fas fa-save" style="font-size: 13px;"></i></span></div></div>';
 	}
 
-	public function edit($id)
+	public function save()
 	{
-		abort_if(gate_denies('branch_edit'), '403 Forbidden');
+		$request = Request::validate('/');
 
-		$pageTitle = "Branch";
+		$title = $request['title'];
+		$content = htmlentities(addslashes($request['content']));
+		$user_id = Auth::user('id');
 
-		$branch = DB()->select("*", "branch", "id = '$id'")->get();
+		$data = array(
+			'note_title' => $title,
+			'note_content' => $content,
+			'user_id' => $user_id
+		);
 
-		$data = [
-			"id" => $branch['id'],
-			"name" => $branch['name'],
-			"status" => $branch['status']
-		];
+		$res = DB()->insert("notes", $data);
+		echo $res;
+	}
 
-		echo json_encode($data);
+	public function data()
+	{
+		$loop_n = [];
+		$user_id = Auth::user('id');
+		$loop_notes = DB()->selectLoop("*", "notes", "user_id = '$user_id' ORDER BY note_id DESC")->get();
+		if (is_array($loop_notes)) {
+			foreach ($loop_notes as $note_list) {
+				$loop_n[] = array(
+					'id' => $note_list['note_id'],
+					'title' => $note_list['note_title'],
+					'content' => html_entity_decode($note_list['note_content']),
+					'user_id' => $note_list['user_id']
+				);
+			}
+		}
+
+		if (!is_array($loop_n)) {
+			echo "no data available";
+		} else {
+			foreach ($loop_n as $note_list) {
+				$noteID = "update_note_content_" . $note_list['id'];
+
+				echo '<div class="card cardNote"><div class="card-body"><textarea class="card-title note-title" rows="1" placeholder="Title" maxlength="999" dir="ltr" style="height: 20px;font-size: 14px; font-style: bolder; font-family: inherit;margin-bottom: 0px;" id="update_note_title_' . $note_list['id'] . '">' . $note_list["title"] . '</textarea><div class="card-text note-content mb-2" rows="1" contenteditable="true" placeholder="Take a note…" maxlength="19999" dir="ltr" style="font-size: 12px; font-family: inherit;white-space: pre-wrap;-webkit-user-modify: read-write-plaintext-only;outline: none;" id="' . $noteID . '">' . html_entity_decode($note_list["content"]) . '</div><span class="badge navbar-badge" data-toggle="tooltip" data-placement="bottom" data-original-title="Delete Note" onclick="deleteNote(\'' . $note_list['id'] . '\')" style="right: 15px !important;"><i class="far fa-trash-alt" style="color: red;font-size: 12px;"></i></span><span class="badge navbar-badge" data-toggle="tooltip" data-placement="bottom" data-original-title="Save Changes" style="right: 35;" onclick="updateNote(\'' . $note_list['id'] . '\')"><i class="fas fa-save" style="font-size: 13px;"></i></span></div></div>';
+			}
+		}
+	}
+
+	public function delete()
+	{
+		$request = Request::validate('/notebook');
+
+		$user_id = Auth::user('id');
+		$note_ID = $request['id'];
+
+		$resconvo_ch = DB()->delete("notes", "note_id = '$note_ID' AND user_id = '$user_id'");
+
+		echo $resconvo_ch;
 	}
 
 	public function update()
 	{
-		$request = Request::validate('/branch', [
-			'u_branch_id' => ['required'],
-			'u_branch_name' => ['required']
-		]);
+		$request = Request::validate('/notebook');
+		$title = $request['title'];
+		$content = htmlentities(addslashes($request['content']));
+		$user_id = Auth::user('id');
 
-		DB()->update("branch", [
-			"name" => $request['u_branch_name']
-		], "id = '$request[u_branch_id]'");
-
-		return redirect('/branch', ["message" => "Updated successfully."]);
+		$note_id = $request['id'];
+		$data = array(
+			'note_title' => $title,
+			'note_content' => $content,
+			'user_id' => $user_id
+		);
+		$res = DB()->update("notes", $data, "note_id='$note_id'");
+		echo $res;
 	}
 
-	public function destroy()
+	public function search()
 	{
-		abort_if(gate_denies('branch_delete'), '403 Forbidden');
+		$request = Request::validate('/notebook');
 
-		foreach ($_REQUEST['id'] as $id) {
-			DB()->delete("branch", "id = '$id'");
+		$search_q = $request['search_q'];
+		$user_id = Auth::user('id');
+
+		$loop_n = array();
+		$loop_notes = DB()->selectLoop("*", "notes", "user_id = '$user_id' AND (note_content LIKE '%$search_q%' OR note_title LIKE '%$search_q%') ORDER BY note_id DESC")->get();
+		if (count($loop_notes) > 0) {
+			foreach ($loop_notes as $note_list) {
+				$loop_n[] = array(
+					'id' => $note_list['note_id'],
+					'title' => $note_list['note_title'],
+					'content' => $note_list['note_content'],
+					'user_id' => $note_list['user_id']
+				);
+			}
+		};
+
+		if (count($loop_n) < 1) {
+			echo "no data available";
+		} else {
+			foreach ($loop_n as $note_list) {
+				$noteID = "update_note_content_" . $note_list['id'];
+				echo '<div class="card cardNote"><div class="card-body"><textarea class="card-title note-title" rows="1" placeholder="Title" maxlength="999" dir="ltr" style="height: 20px;font-size: 14px; font-style: bolder; font-family: inherit;margin-bottom: 0px;" id="update_note_title_' . $note_list['id'] . '">' . $note_list["title"] . '</textarea><div class="card-text note-content mb-2" rows="1" contenteditable="true" placeholder="Take a note…" maxlength="19999" dir="ltr" style="font-size: 12px; font-family: inherit;white-space: pre-wrap;-webkit-user-modify: read-write-plaintext-only;outline: none;" id="' . $noteID . '">' . html_entity_decode($note_list["content"]) . '</div><span class="badge navbar-badge" data-toggle="tooltip" data-placement="bottom" data-original-title="Delete Note" onclick="deleteNote(\'' . $note_list['id'] . '\')" style="right: 15px !important;"><i class="far fa-trash-alt" style="color: red;font-size: 12px;"></i></span><span class="badge navbar-badge" data-toggle="tooltip" data-placement="bottom" data-original-title="Save Changes" style="right: 35;" onclick="updateNote(\'' . $note_list['id'] . '\')"><i class="fas fa-save" style="font-size: 13px;"></i></span></div></div>';
+			}
 		}
-
-		return redirect('/branch', ["message" => "deleted successfully."]);
 	}
 }

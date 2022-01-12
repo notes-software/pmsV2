@@ -52,7 +52,7 @@ require __DIR__ . '/../layouts/head.php'; ?>
 
                 <div class="card-tools">
                     <div class="align-left">
-                        <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#create_branch_modal">Add project</button>
+                        <button type="button" class="btn btn-default btn-sm" onclick="openModalNewProject()">Add project</button>
                     </div>
                 </div>
 
@@ -63,29 +63,48 @@ require __DIR__ . '/../layouts/head.php'; ?>
             <div class="row">
 
                 <?php
+                // dd($projects);
                 foreach ($projects as $project) :
                     $percentage = getProjectPercentage(getFinishTask($project['project_code']), getTotalTask($project['project_code']));
+
+                    if (!empty($project['projects'])) {
+                        $projData = (!empty($project['projects'][0])) ? $project['projects'][0] : $project['projects'];
+
+                        $status = ($projData["status"] == 1) ? "<span style='color: orange !important;'>Closed</span>" : "<span style='color: green !important;'>Active</span>";
+
+                        if ($projData["status"] == 1) {
+                            $status = "Closed";
+                            $statColor = "orange";
+                        } else {
+                            $status = "Active";
+                            $statColor = "success";
+                        }
                 ?>
-                    <div class="col-md-3 col-sm-6 col-12">
-                        <div class="info-box bg-secondary">
-                            <!-- <span class="info-box-icon"><i class="far fa-bookmark"></i></span> -->
-                            <div class="info-box-content">
-                                <span class="info-box-text"><?= getProjectName($project['project_code'], 'projectName') ?></span>
-                                <span class="info-box-text"><?= $project['project_code'] ?></span>
+                        <div class="col-md-3 col-sm-6 col-12">
+                            <div class="info-box bg-gray-dark">
+                                <!-- <span class="info-box-icon"><i class="far fa-bookmark"></i></span> -->
+                                <div class="info-box-content" style="overflow: hidden;text-overflow: ellipsis;">
 
-                                <div class="progress" data-toggle='tooltip' data-placement='bottom' data-original-title='<?= $percentage ?>%'>
-                                    <div class="progress-bar" style="width: <?= $percentage ?>%"></div>
+                                    <span class="info-box-text"><?= getProjectName($projData['projectCode'], 'projectName') ?></span>
+                                    <div class="info-box-text d-flex" style="flex-direction: row;justify-content: space-between;">
+                                        <small class="info-box-text">[ <?= $projData['projectCode'] ?> ] <?= $percentage ?>%</small>
+                                        <div class="info-box-text"><span class="badge rounded-pill bg-<?= $statColor ?>"><?= $status ?></span></div>
+                                    </div>
+
+                                    <div class="progress" data-toggle='tooltip' data-placement='bottom' data-original-title='<?= $percentage ?>%'>
+                                        <div class="progress-bar" style="width: <?= $percentage ?>%"></div>
+                                    </div>
+                                    <span class="info-box-text">
+                                        <a href="<?= route('/project/' . $project['project_code']) ?>" class="btn btn-block btn-dark btn-xs"><i class="fas fa-eye"></i> View Details</a>
+                                    </span>
                                 </div>
-                                <span class="info-box-text">
-                                    <a href="<?= route('/project/' . $project['project_code']) ?>" class="btn btn-block btn-secondary btn-xs"><i class="fas fa-eye"></i> View Details</a>
-                                </span>
+                                <!-- /.info-box-content -->
                             </div>
-                            <!-- /.info-box-content -->
+                            <!-- /.info-box -->
                         </div>
-                        <!-- /.info-box -->
-                    </div>
 
-                <?php endforeach; ?>
+                <?php }
+                endforeach; ?>
 
             </div>
         </div>
@@ -98,46 +117,37 @@ require __DIR__ . '/../layouts/head.php'; ?>
     <!-- /.card -->
 </section>
 
-<?php include_once __DIR__ . '/create_request_modal.php'; ?>
+<?php include_once __DIR__ . '/add_project_modal.php'; ?>
 <?php include_once __DIR__ . '/edit_task_modal.php'; ?>
 
 <script type="text/javascript">
-    $(function() {
-        $("#branch_tbl").DataTable();
-    });
+    $(function() {});
 
-    function editBranch(id) {
-        $.post(base_url + "/branch/view/" + id, {}, function(data) {
-            var branch = JSON.parse(data);
-            $("#u_branch_name").val(branch.name);
-            $("#u_branch_id").val(branch.id);
-            $("#edit_branch_modal").modal('show');
+    function openModalNewProject() {
+        $("#modal-add-project").modal({
+            show: true,
+            backdrop: 'static',
+            keyboard: false
         });
     }
 
-    function deleteBranch() {
-        var checkedValues = $('input:checkbox:checked').map(function() {
-            return this.value;
-        }).get();
-
-        id = [];
-        if (checkedValues == "") {
-            alertMe("Aw Snap!", "No Selected Branch", "warning");
+    function saveNewProject() {
+        var project_name = $("#project_name_modal").val();
+        var project_description = $("#project_description_modal").val();
+        if (project_name == '' || project_description == '') {
+            alertMe("warning", "Input all fields");
         } else {
-            var retVal = confirm("Are you sure to delete?");
-            if (retVal) {
-                $("#delete_branch_btn").prop('disabled', true);
-                $("#delete_branch_btn").html("<span class='fa fa-spin fa-spinner'></span> Loading ...");
-
-                $.post(base_url + "/branch/delete", {
-                    id: checkedValues
-                }, function(data) {
-                    $("#delete_branch_btn").prop('disabled', true);
-                    $("#delete_branch_btn").html("Delete selected branch");
-
+            $.post(base_url + "/project/add", {
+                project_name: project_name,
+                project_description: project_description
+            }, function(data) {
+                if (data == 1) {
+                    $("#modal-add-project").modal('hide');
                     location.reload();
-                });
-            }
+                } else {
+                    alertMe("danger", "Error saving project");
+                }
+            });
         }
     }
 </script>

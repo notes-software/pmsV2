@@ -22,29 +22,26 @@ Route::get('/dashboard', ['DashboardController@index', ['auth']]);
 
 Route::group(['prefix' => 'requestbook', 'middleware' => ['auth']], function () {
     Route::get('/', ['RequestBookController@index']);
-    Route::post('/save', ['BranchController@store']);
-    Route::post('/view/{id}', ['BranchController@edit']);
-    Route::post('/update', ['BranchController@update']);
-    Route::post('/delete', ['BranchController@destroy']);
+    Route::post('/save', ['RequestBookController@save']);
+    Route::post('/delete', ['RequestBookController@delete']);
+    Route::post('/approve', ['RequestBookController@approve']);
+    Route::get('/badgeCountSse', ['RequestBookController@badgeCounter']);
 });
 
 Route::group(['prefix' => 'notebook', 'middleware' => ['auth']], function () {
     Route::get('/', ['NotebookController@index']);
-    Route::get('/create', ['NotebookController@create']);
-    Route::post('/save', ['NotebookController@store']);
-    Route::get('/view/{id}', ['NotebookController@edit']);
-    Route::post('/update/{id}', ['NotebookController@update']);
-    Route::post('/delete', ['NotebookController@destroy']);
+    Route::post('/new', ['NotebookController@add']);
+    Route::post('/save', ['NotebookController@save']);
+    Route::post('/search', ['NotebookController@search']);
+    Route::post('/datas', ['NotebookController@data']);
+    Route::post('/delete', ['NotebookController@delete']);
+    Route::post('/update', ['NotebookController@update']);
 });
 
 Route::group(['prefix' => 'project', 'middleware' => ['auth']], function () {
     Route::get('/', ['ProjectController@index']);
     Route::get('/{projectcode}', ['ProjectController@view']);
-    Route::get('/create', ['ProjectController@create']);
-    Route::post('/save', ['ProjectController@store']);
-    Route::get('/view/{id}', ['ProjectController@edit']);
-    Route::post('/update/{id}', ['ProjectController@update']);
-    Route::post('/delete', ['ProjectController@destroy']);
+    Route::post('/add', ['ProjectController@store']);
 
     Route::group(['prefix' => '/task', 'middleware' => ['auth']], function () {
         Route::post('/', ['ProjectController@task']);

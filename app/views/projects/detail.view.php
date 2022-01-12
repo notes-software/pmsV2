@@ -75,20 +75,28 @@ $isProjTl = isProjectTeamLeader($project['projectCode']);
                 <div class="card-tools">
                     <div class="align-left">
                         <a href="<?= route('/project') ?>" class="btn btn-default btn-sm" data-toggle="tooltip" data-placement="bottom" data-original-title="Go back"><i class="fas fa-arrow-left p-1"></i></a>
-                        <a href="<?= route('/project/settings', $project['projectCode']) ?>" class="btn btn-default btn-sm" data-toggle="tooltip" data-placement="bottom" data-original-title="Project Settings"><i class="fas fa-cog p-1"></i></a>
+
+                        <?php if (isProjectManager($project['projectCode']) == 1 || isProjectTeamLeader($project['projectCode']) == 1) { ?>
+                            <a href="<?= route('/project/settings', $project['projectCode']) ?>" class="btn btn-default btn-sm" data-toggle="tooltip" data-placement="bottom" data-original-title="Project Settings"><i class="fas fa-cog p-1"></i></a>
+                        <?php } ?>
+
                         <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#add_task_modal">New Task</button>
                     </div>
                 </div>
 
                 <div class="card-title">
-                    <select class="form-control-sm select2 " name="myproj-member-selected" id="myproj-member-selected" tabindex="-1" aria-hidden="true" onchange="displayUserTask()">
-                        <option value="">-- select member --</option>
-                        <?php
-                        foreach ($projectMembers as $member) {
-                        ?>
-                            <option value="<?= $member['user_id'] ?>"><?= $member['memberName'] ?></option>
-                        <?php } ?>
-                    </select>
+                    <?php if (isProjectManager($project['projectCode']) == 1 || isProjectTeamLeader($project['projectCode']) == 1) { ?>
+                        <select class="form-control-sm select2 " name="myproj-member-selected" id="myproj-member-selected" tabindex="-1" aria-hidden="true" onchange="displayUserTask()">
+                            <option value="">-- select member --</option>
+                            <?php
+                            if (count($projectMembers) > 0) {
+                                foreach ($projectMembers as $member) {
+                            ?>
+                                    <option value="<?= $member['user_id'] ?>"><?= $member['memberName'] ?></option>
+                            <?php }
+                            } ?>
+                        </select>
+                    <?php } ?>
                 </div>
             </div>
         </div>
@@ -100,12 +108,11 @@ $isProjTl = isProjectTeamLeader($project['projectCode']);
                     <div class="card cardDropOffs">
                         <div class="card-header">
                             <div style="display: flex;flex-direction: row;justify-content: space-between;align-items: center;">
-
-                                <div class="card-tools">
-                                    <div>
-                                        TO DO'S
-                                        <span class="badge badge-secondary navbar-badge" id="counter-todo"></span>
-                                    </div>
+                                <div>
+                                    <span>TO DO'S</span>
+                                </div>
+                                <div>
+                                    <span class=" badge rounded-pill bg-dark" id="counter-todo"></span>
                                 </div>
                             </div>
                         </div>
@@ -121,12 +128,11 @@ $isProjTl = isProjectTeamLeader($project['projectCode']);
                     <div class="card cardDropOffs">
                         <div class="card-header">
                             <div style="display: flex;flex-direction: row;justify-content: space-between;align-items: center;">
-
-                                <div class="card-tools">
-                                    <div>
-                                        IN PROGRESS
-                                        <span class="badge badge-secondary navbar-badge" id="counter-inprogress"></span>
-                                    </div>
+                                <div>
+                                    <span>IN PROGRESS</span>
+                                </div>
+                                <div>
+                                    <span class=" badge rounded-pill bg-dark" id="counter-inprogress"></span>
                                 </div>
                             </div>
                         </div>
@@ -163,8 +169,8 @@ $isProjTl = isProjectTeamLeader($project['projectCode']);
 
                                         <!-- <span class="badge badge-secondary navbar-badge">15</span> -->
                                         <ul class="nav nav-tabs">
-                                            <li class="nav-item"><a class="nav-link active" href="#todaytab" data-toggle="tab">Today ( <span id="counter-today"></span> )</a></li>
-                                            <li class="nav-item"><a class="nav-link" href="#pasttab" data-toggle="tab">Past ( <span id="counter-done"></span> )</a></li>
+                                            <li class="nav-item"><a class="nav-link active" href="#todaytab" data-toggle="tab">Today <span class="badge rounded-pill bg-dark" id="counter-today"></span></a></li>
+                                            <li class="nav-item"><a class="nav-link" href="#pasttab" data-toggle="tab">Past <span class="badge rounded-pill bg-dark" id="counter-done"></span></a></li>
                                         </ul>
 
                                     </div>
@@ -189,7 +195,6 @@ $isProjTl = isProjectTeamLeader($project['projectCode']);
                     </div>
                 </div>
                 <!-- END DONE -->
-
 
             </div>
         </div>
@@ -356,9 +361,9 @@ $isProjTl = isProjectTeamLeader($project['projectCode']);
 
     function taskClothe(list) {
 
-        $deleteOption = (list.allow_delete == 1) ? '<span class="badge navbar-badge" data-toggle="tooltip" data-placement="bottom" data-original-title="Delete task" onclick="deletetask(\'' + list.task_id + '\')"><i class="far fa-trash-alt" style="font-size: 13px;"></i></span>' : '';
+        var deleteOption = (list.allow_delete == 1) ? '<span class="badge navbar-badge" data-toggle="tooltip" data-placement="bottom" data-original-title="Delete task" onclick="deletetask(\'' + list.task_id + '\')" style="right: 15px !important;cursor: default;"><i class="far fa-trash-alt" style="font-size: 13px;"></i></span>' : '';
 
-        $viewOption = ($deleteOption == '') ? '5px' : '30';
+        $viewOption = (deleteOption == '') ? '15px' : '35';
 
         var task_member = "";
         var memTDCounter = 1;
@@ -366,17 +371,17 @@ $isProjTl = isProjectTeamLeader($project['projectCode']);
             for (var tmem = 0; tmem < list.task_member.length; tmem++) {
                 var mmbr = list.task_member[tmem];
                 if (tmem <= 3) {
-                    task_member += "<img src='" + mmbr.member_avatar + "' style='width:20px; height: 20px;object-fit: cover;margin-left: 1px;' class='rounded-circle' data-toggle='tooltip' data-placement='bottom' title='' data-original-title='" + mmbr.member_name + "'>";
+                    task_member += "<img src='" + mmbr.member_avatar + "' style='width:20px; height: 20px;object-fit: cover;margin-left: 1px;cursor: default;' class='rounded-circle' data-toggle='tooltip' data-placement='bottom' title='' data-original-title='" + mmbr.member_name + "'>";
                 } else {
                     if (memTDCounter == 1) {
-                        task_member += '<span class="rounded-circle" style="margin-left: 1px;padding: 2px;font-size: 12px;background-color: #868686 !important;" data-toggle="tooltip" data-placement="bottom" data-original-title="+' + (list.task_member.length - 4) + ' more">+' + (list.task_member.length - 4) + '</span>';
+                        task_member += '<span class="rounded-circle" style="margin-left: 1px;padding: 2px;font-size: 12px;background-color: #868686 !important;cursor: default;" data-toggle="tooltip" data-placement="bottom" data-original-title="+' + (list.task_member.length - 4) + ' more">+' + (list.task_member.length - 4) + '</span>';
                     }
                     memTDCounter++;
                 }
             }
         }
 
-        return '<div class="col-md-12 col-sm-12 col-12" id="' + list.task_id + '"><div class="row"><div class="info-box bg-' + list.priority_color + '"><div class="info-box-content"><div class="mt-1" style="cursor: default;">' + task_member + '</div><div class="d-flex" style="flex-direction: row;justify-content: space-between;"><div><small class="info-box-text mt-1"><i class="far fa-calendar-check"></i> Due: ' + list.date + '</small></div><div><small class="info-box-text mt-1">Code: ' + list.task_code + '</small></div></div>' + $deleteOption + '<span class="badge navbar-badge" data-toggle="tooltip" data-placement="bottom" data-original-title="View task" style="right: ' + $viewOption + ';" onclick="viewTask(\'' + list.task_id + '\', \'' + list.module + '\')"><i class="fas fa-eye" style="font-size: 13px;"></i></span><span class="info-box-text"><pre class="mt-1" style="white-space: pre-wrap;font-family: myFirstFont;font-size: inherit;padding: 0px;color: inherit;background: inherit;background : transparent;">' + list.task + '</pre></span></div></div></div></div>';
+        return '<div class="col-md-12 col-sm-12 col-12" id="' + list.task_id + '"><div class="row"><div class="info-box bg-' + list.priority_color + '" style="cursor: move;"><div class="info-box-content"><div class="mt-1">' + task_member + '</div><div class="d-flex" style="flex-direction: row;justify-content: space-between;"><div><small class="info-box-text mt-1"><i class="far fa-calendar-check"></i> Due: ' + list.date + '</small></div><div><small class="info-box-text mt-1">Code: ' + list.task_code + '</small></div></div>' + deleteOption + '<span class="badge navbar-badge" data-toggle="tooltip" data-placement="bottom" data-original-title="View task" style="cursor: default;right: ' + $viewOption + ';" onclick="viewTask(\'' + list.task_id + '\', \'' + list.module + '\')"><i class="fas fa-eye" style="font-size: 13px;"></i></span><span class="info-box-text"><pre class="mt-1 px-2" style="white-space: pre-wrap;font-family: myFirstFont;font-size: inherit;padding: 0px;color: inherit;background: #0000001a;border-radius: 3px;">' + list.task + '</pre></span></div></div></div></div>';
     }
 
     function updateType(id, type) {
@@ -431,6 +436,14 @@ $isProjTl = isProjectTeamLeader($project['projectCode']);
                     $("#task_v_date").val(tsk_dt.date);
                     $("#v_task_prio_status").val(tsk_dt.priority);
                     $("#v_task_desc").html(tsk_dt.task);
+
+                    if (tsk_dt.task_type != "DONE") {
+                        $('#saveChangesBtn').html('<a href="#" class="btn btn-primary btn-sm float-right" onclick="save_task_details()">Save Changes</a>');
+                        $('#shareTaskBin').show();
+                    } else {
+                        $('#saveChangesBtn').html('');
+                        $('#shareTaskBin').hide();
+                    }
 
                     var member_list = "";
                     var member_remove_btn;

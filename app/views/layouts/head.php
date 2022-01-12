@@ -165,6 +165,7 @@ if (empty($_SESSION['system']['branch_id'])) {
 		$(function() {
 			$("body").tooltip({
 				selector: '[data-toggle=tooltip]',
+				trigger: 'hover',
 				container: 'body'
 			});
 		});

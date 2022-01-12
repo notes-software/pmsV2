@@ -2,6 +2,8 @@
 
 use App\Core\Request;
 use App\Core\Auth;
+use App\Core\App;
+use App\Core\Database\Connection\Connection;
 
 function getProjectName($projectCode, $col)
 {
@@ -217,6 +219,7 @@ function isProjectTeamLeader($projectCode)
 
 function getProjectMember($code)
 {
+	$data = [];
 	$query = DB()->selectLoop("*", "project_member", "projectCode = '$code' AND user_id != 0 GROUP BY user_id")
 		->with([
 			"users" => ['user_id', 'id']
@@ -245,4 +248,62 @@ function getUserAvatar($user_id)
 	$res = DB()->select("slug", "users", "id = '$user_id'")->get();
 	$showPic = ($res['slug'] != "") ? $res['slug'] : 'user_default_avatar.png';
 	return public_url("/assets/pms/user_avatar/{$showPic}");
+}
+
+function getMyGroups($user_id)
+{
+	$data = [];
+	$loop_group = DB()->selectLoop("*", "teams", "created_by = '$user_id'")->get();
+	if (count($loop_group) > 0) {
+		foreach ($loop_group as $group_list) {
+			$data[] = array(
+				'team_id' => $group_list['team_id'],
+				'team_code' => $group_list['teamCode'],
+				'team_name' => $group_list['teamName'],
+			);
+		}
+	}
+
+	return $data;
+}
+
+function getUserName($userID)
+{
+	$getUserName = DB()->select("fullname", "users", "id = '$userID'")->get();
+	return $getUserName['fullname'];
+}
+
+function dueDateForthisWeek()
+{
+	$userid = Auth::user('id');
+	$today = date('Y-m-d');
+	$tasks = DB()->selectLoop("task.*, taskmem.*", "tasks AS task, task_member as taskmem ", "taskmem.task_id = task.task_id AND taskmem.user_id = '$userid' AND task.taskDueDate <= '$today' AND task.status = '1' ORDER BY task.priority_stats DESC , task.taskDueDate ASC")
+		->with([
+			'projects' => ['projectCode', 'projectCode'],
+			'users' => ['user_id', 'id']
+		])
+		->get();
+
+	return $tasks;
+}
+
+function conns()
+{
+	return Connection::make(App::get('config')['database']);
+}
+
+function clean($str)
+{
+	$str = @trim($str);
+	$str = stripslashes($str);
+
+	return htmlentities(conns()->quote($str));
+}
+
+function totalRequestBook()
+{
+	$user_id = Auth::user('id');
+	$res = DB()->select("count(request_id) as idCounter", "request_logs", "status = 0 GROUP BY status")->get();
+	$total = ($user_id == 19) ? (($res['idCounter'] > 0) ? $res['idCounter'] : "") : "";
+	return $total;
 }

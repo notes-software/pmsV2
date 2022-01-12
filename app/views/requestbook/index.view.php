@@ -37,8 +37,7 @@ require __DIR__ . '/../layouts/head.php'; ?>
 
                 <div class="card-tools">
                     <div class="align-left">
-                        <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#create_branch_modal">Add request</button>
-                        <button type="button" id="delete_branch_btn" class="btn btn-default btn-sm" onclick="deleteBranch()">Delete selected request</button>
+                        <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#log_a_request_modal">Add request</button>
                     </div>
                 </div>
 
@@ -46,28 +45,50 @@ require __DIR__ . '/../layouts/head.php'; ?>
             </div>
         </div>
         <div class="card-body">
-            <table id="branch_tbl" class="table table-bordered">
+            <table id="rb_tbl" class="table table-bordered">
                 <thead>
                     <tr>
                         <th class="no-sort" style="width: 15px;"></th>
                         <th class="no-sort" style="width: 15px;"></th>
-                        <th>BRANCH NAME</th>
-                        <th style="width: 90px;">STATUS</th>
+                        <th>Requested by</th>
+                        <th>Created date</th>
+                        <th>Created by</th>
+                        <th>Approve date</th>
+                        <th>Approve by</th>
+                        <th>Description</th>
+                        <th>Remarks</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php
-                    if ($requests != null) {
+                    if (count($requests) > 0) {
+                        $user_id = Auth::user('id');
                         foreach ($requests as $request) {
                             $status = ($request['status'] == 0) ? '<span style="color: green;">Active</span>' : '<span style="color: red;">Inactive</span>';
+
+                            $appDate = ($request['approve_date'] == "0000-00-00 00:00:00") ? '<span style="color: orange;">pending</span>' : date("M d, Y", strtotime($request['approve_date']));
+
+                            $appBy = ($request['approved_by'] == 0) ? '<span style="color: orange;">pending</span>' : getUserName($request['approved_by']);
+
+                            $delBtn = ($user_id == $request['person_assigned']) ? '<a style="color: #605e5e;" onclick="deleteRequest(\'' . $request['request_id'] . '\')" data-toggle="tooltip" data-placement="bottom" data-original-title="Delete"><i class="far fa-trash-alt"></i></a>' : '';
+
+                            $approvalBtn = ($user_id == 19) ? '<a style="color: #605e5e;" onclick="approveRequest(\'' . $request['request_id'] . '\')" data-toggle="tooltip" data-placement="bottom" data-original-title="Approve"><i class=" far fa-check-circle"></i></a>' : '';
                     ?>
                             <tr>
-                                <td class="no-sort text-center"><input type='checkbox' name='checkbox' value='<?= $request['id'] ?>'></td>
                                 <td class="no-sort text-center">
-                                    <a style="color: #605e5e;" onclick="editBranch('<?= $request['id'] ?>')"><i class="far fa-edit"></i></a>
+                                    <a style="color: #605e5e;" data-toggle="tooltip" data-placement="bottom" data-original-title="Edit"><i class=" far fa-edit"></i></a>
                                 </td>
-                                <td><?= $request['name'] ?></td>
-                                <td style="width: 90px;"><?= $status ?></td>
+                                <td class="no-sort text-center">
+                                    <?= $approvalBtn ?>
+                                    <?= $delBtn ?>
+                                </td>
+                                <td><?= $request['requested_by'] ?></td>
+                                <td><?= date("M d, Y", strtotime($request['request_date'])) ?></td>
+                                <td><?= getUserName($request['person_assigned']) ?></td>
+                                <td><?= $appDate ?></td>
+                                <td><?= $appBy ?></td>
+                                <td style="white-space: pre-wrap;"><?= html_entity_decode($request['logs']) ?></td>
+                                <td><?= html_entity_decode($request['remarks']) ?></td>
                             </tr>
                     <?php }
                     } ?>
@@ -83,47 +104,65 @@ require __DIR__ . '/../layouts/head.php'; ?>
     <!-- /.card -->
 </section>
 
-<?php include_once __DIR__ . '/create_request_modal.php'; ?>
-<?php include_once __DIR__ . '/edit_request_modal.php'; ?>
+<?php include_once __DIR__ . '/add_remarks.view.php'; ?>
+<?php include_once __DIR__ . '/log_a_request.view.php'; ?>
 
 <script type="text/javascript">
     $(function() {
-        $("#branch_tbl").DataTable();
+        $('#rb_tbl').dataTable();
     });
 
-    function editBranch(id) {
-        $.post(base_url + "/branch/view/" + id, {}, function(data) {
-            var branch = JSON.parse(data);
-            $("#u_branch_name").val(branch.name);
-            $("#u_branch_id").val(branch.id);
-            $("#edit_branch_modal").modal('show');
+    function saveNewRequestBook() {
+        var requestedBy = $("#rb_requested_by").val();
+        var description = $("#rb_description").val();
+        if (requestedBy == "" || description == "") {
+            alertMe("warning", "please fill all fields");
+        } else {
+            $.post(base_url + "/requestbook/save", {
+                requestedBy: requestedBy,
+                description: description
+            }, function(data) {
+                if (data == 1) {
+                    alertMe("success", 'Request saved');
+                    $("#log_a_request_modal").modal('hide');
+                } else {
+                    alertMe('danger', 'Error in saving your request.');
+                }
+                location.reload();
+            });
+        }
+    }
+
+    function approveRequest(requestid) {
+        $("#rb_request_id").val(requestid);
+        $("#modal-approve-remarks").modal({
+            show: true,
+            backdrop: 'static',
+            keyboard: false
         });
     }
 
-    function deleteBranch() {
-        var checkedValues = $('input:checkbox:checked').map(function() {
-            return this.value;
-        }).get();
-
-        id = [];
-        if (checkedValues == "") {
-            alertMe("Aw Snap!", "No Selected Branch", "warning");
-        } else {
-            var retVal = confirm("Are you sure to delete?");
-            if (retVal) {
-                $("#delete_branch_btn").prop('disabled', true);
-                $("#delete_branch_btn").html("<span class='fa fa-spin fa-spinner'></span> Loading ...");
-
-                $.post(base_url + "/branch/delete", {
-                    id: checkedValues
-                }, function(data) {
-                    $("#delete_branch_btn").prop('disabled', true);
-                    $("#delete_branch_btn").html("Delete selected branch");
-
-                    location.reload();
-                });
-            }
+    function deleteRequest(id) {
+        var res = confirm("Are you sure you want to delete this request?");
+        if (res) {
+            $.post(base_url + "/requestbook/delete", {
+                id: id
+            }, function(data) {
+                location.reload();
+            });
         }
+    }
+
+    function completeApprovalRequest() {
+        var request_id = $("#rb_request_id").val();
+        var rb_remarks = $("#rb_remarks").val();
+        $.post(base_url + "/requestbook/approve", {
+            request_id: request_id,
+            rb_remarks: rb_remarks
+        }, function(data) {
+            $("#modal-approve-remarks").modal('hide');
+            location.reload();
+        });
     }
 </script>
 

@@ -108,6 +108,10 @@ Route::group(['prefix' => 'settings', 'middleware' => ['auth']], function () {
     });
 });
 
+Route::group(['prefix' => 'chat', 'middleware' => ['auth']], function () {
+    Route::get('/', ['ChatController@index']);
+});
+
 Route::get('/test', function () {
     dd(Route::uriCollection());
 });

@@ -151,7 +151,6 @@ if (empty($_SESSION['system']['branch_id'])) {
 	<script src="<?= public_url('/assets/adminlte/plugins/jquery/jquery.min.js') ?>"></script>
 	<script src="<?= public_url('/assets/adminlte/js/jquery-ui.min.js') ?>"></script>
 	<script src="<?= public_url('/assets/adminlte/plugins/sweetalert2/sweetalert2.min.js') ?>"></script>
-	<script src="https://requirejs.org/docs/release/2.3.5/minified/require.js"></script>
 
 	<?php
 	// this will auto include filepond css/js when adding filepond in public/assets

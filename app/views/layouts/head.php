@@ -18,6 +18,8 @@ if (empty($_SESSION['system']['branch_id'])) {
 		<?= ucfirst($pageTitle) . " | " . App::get('config')['app']['name'] ?>
 	</title>
 
+	<link href='https://fonts.googleapis.com/css?family=Open Sans' rel='stylesheet'>
+
 	<!-- Font Awesome Icons -->
 	<link rel="stylesheet" href="<?= public_url('/assets/adminlte/plugins/fontawesome-free/css/all.min.css') ?>">
 	<link rel="stylesheet" href="<?= public_url('/assets/adminlte/plugins/datatables-bs4/css/dataTables.bootstrap4.css') ?>">
@@ -39,10 +41,10 @@ if (empty($_SESSION['system']['branch_id'])) {
 		}
 
 		body {
-			font-weight: 300;
+			/* font-weight: 300; */
 			font-size: 14px;
-			font-family: Nunito;
-			color: #26425f;
+			/* font-family: "Open Sans"; */
+			color: #222222 !important;
 			background: #eef1f4;
 		}
 
@@ -275,4 +277,5 @@ if (empty($_SESSION['system']['branch_id'])) {
 		<?php require_once(__DIR__ . '/sidebar.php'); ?>
 
 		<!-- Content Wrapper. Contains page content -->
+
 		<div class="content-wrapper">

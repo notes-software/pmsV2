@@ -262,6 +262,7 @@ $isProjTl = isProjectTeamLeader($project['projectCode']);
             project_code: project_code,
             memberSelected: memberSelected
         }, function(data) {
+            $('[data-toggle="tooltip"]').tooltip('hide');
             // $('#user_task_container').html(data);
             var task_data = JSON.parse(data);
             var todo_cloth = "",

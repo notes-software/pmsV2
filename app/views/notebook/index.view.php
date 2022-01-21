@@ -24,6 +24,15 @@ require __DIR__ . '/../layouts/head.php'; ?>
     .cardNote {
         border: 0.5px solid #a3a3a38f
     }
+
+    .card-title {
+        font-weight: 600;
+        color: #222222;
+    }
+
+    .card-text {
+        color: #222222;
+    }
 </style>
 
 <!-- Content Header (Page header) -->

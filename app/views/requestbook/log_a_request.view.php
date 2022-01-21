@@ -3,7 +3,7 @@
         <div class="modal-content">
             <input type="hidden" id="u_branch_id" name="u_branch_id">
             <div class="modal-header">
-                <h4 class="modal-title">Branch Detail</h4>
+                <h4 class="modal-title">New Request</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>

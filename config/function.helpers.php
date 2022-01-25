@@ -8,7 +8,7 @@ use App\Core\Database\Connection\Connection;
 function getProjectName($projectCode, $col)
 {
 	$projName = DB()->select($col, "projects", "projectCode = '$projectCode'")->get();
-	return (!empty($projName[$col])) ? $projName[$col] : 'PERSONAL';
+	return $projName[$col];
 }
 
 function getTotalTask($projectCode)

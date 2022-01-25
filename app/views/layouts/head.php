@@ -32,6 +32,7 @@ if (empty($_SESSION['system']['branch_id'])) {
 	<link rel="stylesheet" href="<?= public_url('/assets/adminlte/plugins/select2/css/select2.min.css') ?>">
 	<link rel="stylesheet" href="<?= public_url('/assets/sprnva/css/multiple-select.css') ?>">
 	<link rel="stylesheet" href="<?= public_url('/assets/adminlte/plugins/toastr/toastr.min.css') ?>">
+	<link rel="stylesheet" href="<?= public_url('/assets/adminlte/plugins/fullcalendar/main.css') ?>">
 	<link rel="stylesheet" href="<?= public_url('/assets/adminlte/plugins/sweetalert2/bootstrap-4.min.css') ?>">
 
 	<style>

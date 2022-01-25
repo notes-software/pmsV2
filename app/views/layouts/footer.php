@@ -37,6 +37,8 @@
 <script src="<?= public_url('/assets/adminlte/plugins/datatables/jquery.dataTables.js') ?>"></script>
 <script src="<?= public_url('/assets/adminlte/plugins/datatables-bs4/js/dataTables.bootstrap4.js') ?>"></script>
 <script src="<?= public_url('/assets/adminlte/plugins/toastr/toastr.min.js') ?>"></script>
+<script src="<?= public_url('/assets/adminlte/plugins/moment/moment.min.js') ?>"></script>
+<script src="<?= public_url('/assets/adminlte/plugins/fullcalendar/main.js') ?>"></script>
 
 <!-- AdminLTE App -->
 <script src="<?= public_url('/assets/adminlte/js/adminlte.min.js') ?>"></script>

@@ -28,6 +28,18 @@ Route::group(['prefix' => 'requestbook', 'middleware' => ['auth']], function () 
     Route::get('/badgeCountSse', ['RequestBookController@badgeCounter']);
 });
 
+Route::group(['prefix' => 'mycalendar', 'middleware' => ['auth']], function () {
+    Route::get('/', ['CalendarController@index']);
+    Route::get('/tasks', ['CalendarController@tasks']);
+    Route::post('/tasks/add', ['CalendarController@taskAdd']);
+    Route::post('/tasks/detail', ['CalendarController@taskDetail']);
+    Route::post('/search', ['CalendarController@search']);
+    Route::post('/datas', ['CalendarController@data']);
+    Route::post('/delete', ['CalendarController@delete']);
+    Route::post('/update', ['CalendarController@update']);
+});
+
+
 Route::group(['prefix' => 'notebook', 'middleware' => ['auth']], function () {
     Route::get('/', ['NotebookController@index']);
     Route::post('/new', ['NotebookController@add']);

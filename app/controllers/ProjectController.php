@@ -129,10 +129,19 @@ class ProjectController
 		$task_type = $request["type"];
 
 		$task_code = DB()->select("task_code", "tasks", "task_id = '$task_id'")->get();
-		$data = array(
-			'status' => $task_type,
-			"finishDate" => date("Y-m-d H:i:s")
-		);
+
+		if ($task_type == 1) {
+			$data = array(
+				// "taskCreateDate" => date("Y-m-d H:i:s"),
+				'status' => $task_type,
+			);
+		} else if ($task_type == 2) {
+			$data = array(
+				'status' => $task_type,
+				"finishDate" => date("Y-m-d H:i:s")
+			);
+		}
+
 		$result = DB()->update("tasks", $data, "task_id = '$task_id'");
 		if ($result) {
 			if ($task_type != 0) {
@@ -183,7 +192,7 @@ class ProjectController
 
 		$taskDueDate = $request['due_date'];
 		$user_id = Auth::user('id');
-		$taskDescription = $request['taskDescription'];
+		$taskDescription = htmlentities(addslashes($request['taskDescription']));
 		$status = 0;
 		$priority_stats = $request['priority_status'];
 		$projectCode = $request['projectCode'];
@@ -220,7 +229,7 @@ class ProjectController
 		$task_code = $request['task_code'];
 
 		$data = array(
-			'taskDescription'    => $request['task_desc'],
+			'taskDescription'    => htmlentities(addslashes($request['task_desc'])),
 			'taskDueDate'        => date("Y-m-d", strtotime($request['task_due_date'])),
 			'priority_stats'    => $request['task_prio']
 		);
@@ -286,12 +295,14 @@ class ProjectController
 		if ($isNotExist['totals'] < 1) {
 
 			$isProjExist = DB()->select("count(*)", "project_member", "user_id = '$user_id' AND projectCode = '$project_code'")->get();
-			if ($isProjExist[0] < 1) {
-				$data = array(
-					'projectCode'    => $project_code,
-					'user_id'        => $user_id
-				);
-				$res = DB()->insert("project_member", $data);
+			if (!empty($isProjExist[0])) {
+				if ($isProjExist[0] < 1) {
+					$data = array(
+						'projectCode'    => $project_code,
+						'user_id'        => $user_id
+					);
+					$res = DB()->insert("project_member", $data);
+				}
 			}
 
 			$data = array(

@@ -188,7 +188,7 @@ $projectCode = (empty($projectDetail['projectCode'])) ? 0 : $projectDetail['proj
             projCode: projectCode,
             proj_stats: proj_stats
         }, function(data) {
-            console.log(data);
+            // console.log(data);
             var projmember = JSON.parse(data);
             var member_list = '';
 

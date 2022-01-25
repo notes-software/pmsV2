@@ -230,7 +230,7 @@ $isProjTl = isProjectTeamLeader($project['projectCode']);
 
         id = [];
         if (checkedValues == "") {
-            alertMe("Aw Snap!", "No Selected Branch", "warning");
+            alertMe("warning", "No Selected Branch");
         } else {
             var retVal = confirm("Are you sure to delete?");
             if (retVal) {

@@ -33,6 +33,17 @@ use App\Core\Request;
 							]
 						]
 					],
+					'MY CALENDAR' => [
+						'isTree' => 0,
+						'icon' => 'far fa-calendar-alt',
+						'child' => [
+							'my_calendar_access' => [
+								'route' => '/mycalendar',
+								'name' => 'mycalendar',
+								'level' => 1
+							]
+						]
+					],
 					'REQUEST BOOK' => [
 						'isTree' => 0,
 						'icon' => 'fas fa-book',
@@ -40,7 +51,7 @@ use App\Core\Request;
 							'request_book_access' => [
 								'route' => '/requestbook',
 								'name' => 'requestbook',
-								'level' => 1
+								'level' => 2
 							]
 						]
 					],
@@ -51,7 +62,7 @@ use App\Core\Request;
 							'notebook_access' => [
 								'route' => '/notebook',
 								'name' => 'notebook',
-								'level' => 2
+								'level' => 3
 							]
 						]
 					],
@@ -62,7 +73,7 @@ use App\Core\Request;
 							'project_access' => [
 								'route' => '/project',
 								'name' => 'project',
-								'level' => 3
+								'level' => 4
 							]
 						]
 					],

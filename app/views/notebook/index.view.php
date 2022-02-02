@@ -58,11 +58,6 @@ require __DIR__ . '/../layouts/head.php'; ?>
         }
     }
 
-    .badge {
-        padding: 6px;
-        border-radius: 12px;
-    }
-
     .noteEditor {
         font-size: 20px;
         font-family: inherit;

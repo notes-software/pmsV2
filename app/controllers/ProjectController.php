@@ -192,7 +192,7 @@ class ProjectController
 
 		$taskDueDate = $request['due_date'];
 		$user_id = Auth::user('id');
-		$taskDescription = htmlentities(addslashes($request['taskDescription']));
+		$taskDescription = addslashes($request['taskDescription']);
 		$status = 0;
 		$priority_stats = $request['priority_status'];
 		$projectCode = $request['projectCode'];
@@ -229,7 +229,7 @@ class ProjectController
 		$task_code = $request['task_code'];
 
 		$data = array(
-			'taskDescription'    => htmlentities(addslashes($request['task_desc'])),
+			'taskDescription'    => addslashes($request['task_desc']),
 			'taskDueDate'        => date("Y-m-d", strtotime($request['task_due_date'])),
 			'priority_stats'    => $request['task_prio']
 		);

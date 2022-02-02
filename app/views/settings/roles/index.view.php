@@ -6,7 +6,7 @@ use App\Core\Request;
 require __DIR__ . '/../../layouts/head.php'; ?>
 
 <style>
-    .badge {
+    .badgePermission {
         margin: 1px;
         font-size: 87%;
     }
@@ -68,7 +68,7 @@ require __DIR__ . '/../../layouts/head.php'; ?>
                                     <td>
                                         <?php
                                         foreach (explode(',', $role['permission']) as $permission) {
-                                            echo '<span class="badge badge-info">' . getPermissionName($permission) . '</span>';
+                                            echo '<span class="badge badge-info badgePermission">' . getPermissionName($permission) . '</span>';
                                         }
                                         ?>
                                     </td>

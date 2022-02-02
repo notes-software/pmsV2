@@ -34,7 +34,7 @@ $isProjTl = isProjectTeamLeader($project['projectCode']);
     }
 
     .droptarget {
-        /* height: 600px; */
+        max-height: 600px;
     }
 
     .ch-padd-hover:hover {
@@ -105,7 +105,7 @@ $isProjTl = isProjectTeamLeader($project['projectCode']);
 
                 <!-- TODO'S -->
                 <div class="col-md-4 col-sm-6 col-12">
-                    <div class="card cardDropOffs">
+                    <div class="card cardDropOffs h-full">
                         <div class="card-header">
                             <div style="display: flex;flex-direction: row;justify-content: space-between;align-items: center;">
                                 <div>
@@ -116,7 +116,7 @@ $isProjTl = isProjectTeamLeader($project['projectCode']);
                                 </div>
                             </div>
                         </div>
-                        <div class="card-body p-2 drops droptarget msg_chat_scroll" id="sortable1">
+                        <div class="card-body p-2 drops droptarget msg_chat_scroll " id="sortable1">
 
                         </div>
                     </div>
@@ -125,7 +125,7 @@ $isProjTl = isProjectTeamLeader($project['projectCode']);
 
                 <!-- IN PROGRESS -->
                 <div class="col-md-4 col-sm-6 col-12">
-                    <div class="card cardDropOffs">
+                    <div class="card cardDropOffs h-full">
                         <div class="card-header">
                             <div style="display: flex;flex-direction: row;justify-content: space-between;align-items: center;">
                                 <div>
@@ -161,7 +161,7 @@ $isProjTl = isProjectTeamLeader($project['projectCode']);
                     </div> -->
 
                     <div class="card cardDropOffs">
-                        <div class="card-header pb-0 pt-1">
+                        <div class="card-header pb-0 pt-1 h-full">
                             <div style="display: flex;flex-direction: row;justify-content: space-between;align-items: center;">
                                 <div class="card-tools">DONE</div>
                                 <div class="card-tools">
@@ -178,19 +178,7 @@ $isProjTl = isProjectTeamLeader($project['projectCode']);
                             </div>
                         </div><!-- /.card-header -->
                         <div class="card-body p-2 drops droptarget msg_chat_scroll" id="sortable3">
-                            <div class="tab-content">
-                                <div class="tab-pane active" id="todaytab">
-                                    <div id="sortable3_today" style="min-height: 150px;">
-                                    </div>
-                                </div>
-                                <!-- /.tab-pane -->
-                                <div class="tab-pane" id="pasttab">
-                                    <div id="sortable3_all">
-                                    </div>
-                                </div>
-                                <!-- /.tab-pane -->
-                            </div>
-                            <!-- /.tab-content -->
+
                         </div><!-- /.card-body -->
                     </div>
                 </div>
@@ -302,7 +290,8 @@ $isProjTl = isProjectTeamLeader($project['projectCode']);
             const year = today.getFullYear();
             const date = today.getDate();
             const month = today.getMonth() + 1;
-            var now = year + "-" + month + "-" + date;
+            var _day = (date < 10) ? '0' + date : date;
+            var now = year + "-" + month + "-" + _day;
 
             var done_len = (task_data.done == null) ? 0 : task_data.done.length;
             var count_all = 0,
@@ -322,6 +311,9 @@ $isProjTl = isProjectTeamLeader($project['projectCode']);
                     }
                 }
             }
+
+            $('#sortable3').html('<div class="tab-content"><div class="tab-pane active" id="todaytab"><div id="sortable3_today"></div></div><div class="tab-pane" id="pasttab"><div id="sortable3_all"></div></div></div>');
+
             $('#sortable3_today').html(done_cloth_today);
             $("#counter-today").html(count_today);
 
@@ -336,12 +328,12 @@ $isProjTl = isProjectTeamLeader($project['projectCode']);
         var hasUserID = $("#has_user_id").val();
         if (hasUserID != "") {
             $(function() {
-                $("#sortable1, #sortable2").sortable({
+                $("#sortable1, #sortable2, #sortable3, #sortable3_today").sortable({
                     connectWith: ".drops"
                 }).disableSelection();
             });
 
-            $("#sortable1, #sortable2, #sortable3").droppable({
+            $("#sortable1, #sortable2, #sortable3, #sortable3_today").droppable({
                 drop: function(event, ui) {
                     var draggableId = ui.draggable.attr("id");
                     var parent_id = event.target.id;
@@ -382,7 +374,7 @@ $isProjTl = isProjectTeamLeader($project['projectCode']);
             }
         }
 
-        return '<div class="col-md-12 col-sm-12 col-12" id="' + list.task_id + '"><div class="row"><div class="info-box bg-' + list.priority_color + '" style="cursor: move;"><div class="info-box-content"><div class="mt-1">' + task_member + '</div><div class="d-flex" style="flex-direction: row;justify-content: space-between;"><div><small class="info-box-text mt-1"><i class="far fa-calendar-check"></i> Due: ' + list.date + '</small></div><div><small class="info-box-text mt-1">Code: ' + list.task_code + '</small></div></div>' + deleteOption + '<span class="badge navbar-badge" data-toggle="tooltip" data-placement="bottom" data-original-title="View task" style="cursor: default;right: ' + $viewOption + ';" onclick="viewTask(\'' + list.task_id + '\', \'' + list.module + '\')"><i class="fas fa-eye" style="font-size: 13px;"></i></span><span class="info-box-text"><pre class="mt-1 px-2" style="white-space: pre-wrap;font-family: myFirstFont;font-size: inherit;padding: 0px;color: inherit;background: #0000001a;border-radius: 3px;">' + list.task + '</pre></span></div></div></div></div>';
+        return '<div class="col-md-12 col-sm-12 col-12" id="' + list.task_id + '"><div class="row"><div class="info-box bg-' + list.priority_color + '" style="cursor: move;"><div class="info-box-content"><div class="mt-1">' + task_member + '</div><div class="d-flex" style="flex-direction: row;justify-content: space-between;"><div><small class="info-box-text mt-1"><i class="far fa-calendar-check"></i> <b>Due:</b> ' + list.date + '</small></div><div><small class="info-box-text mt-1"><b>Code:</b> ' + list.task_code + '</small></div></div>' + deleteOption + '<span class="badge navbar-badge" data-toggle="tooltip" data-placement="bottom" data-original-title="View task" style="cursor: default;right: ' + $viewOption + ';" onclick="viewTask(\'' + list.task_id + '\', \'' + list.module + '\')"><i class="fas fa-eye" style="font-size: 13px;"></i></span><span class="info-box-text"><pre class="mt-1 px-2" style="white-space: pre-wrap;font-family: myFirstFont;font-size: inherit;padding: 0px;color: inherit;background: #0000001a;border-radius: 3px;">' + list.task + '</pre></span></div></div></div></div>';
     }
 
     function updateType(id, type) {

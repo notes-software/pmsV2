@@ -116,7 +116,7 @@ $isProjTl = isProjectTeamLeader($project['projectCode']);
                                 </div>
                             </div>
                         </div>
-                        <div class="card-body p-2 drops droptarget msg_chat_scroll " id="sortable1">
+                        <div class="card-body p-2 drops droptarget msg_chat_scroll_steady " id="sortable1">
 
                         </div>
                     </div>
@@ -136,7 +136,7 @@ $isProjTl = isProjectTeamLeader($project['projectCode']);
                                 </div>
                             </div>
                         </div>
-                        <div class="card-body p-2 drops droptarget msg_chat_scroll" id="sortable2">
+                        <div class="card-body p-2 drops droptarget msg_chat_scroll_steady" id="sortable2">
                         </div>
                     </div>
                 </div>
@@ -177,7 +177,7 @@ $isProjTl = isProjectTeamLeader($project['projectCode']);
                                 </div>
                             </div>
                         </div><!-- /.card-header -->
-                        <div class="card-body p-2 drops droptarget msg_chat_scroll" id="sortable3">
+                        <div class="card-body p-2 drops droptarget msg_chat_scroll_steady" id="sortable3">
 
                         </div><!-- /.card-body -->
                     </div>
@@ -379,7 +379,18 @@ $isProjTl = isProjectTeamLeader($project['projectCode']);
         var taskTitleLen = (list.task.length > 100) ? ' . . .' : '';
         var tasktitle = (list.task_title != "") ? list.task_title : shortTaskDesc + taskTitleLen;
 
-        return '<div class="col-md-12 col-sm-12 col-12" id="' + list.task_id + '"><div class="row"><div class="info-box bg-' + list.priority_color + '" style="cursor: move;"><div class="info-box-content"><div class="mt-1">' + task_member + '</div><div class="d-flex" style="flex-direction: row;justify-content: space-between;"><div><small class="info-box-text mt-1"><i class="far fa-calendar-check"></i> <b>Due:</b> ' + list.date + '</small></div><div><small class="info-box-text mt-1"><b>Code:</b> ' + list.task_code + '</small></div></div>' + deleteOption + '<span class="badge navbar-badge" data-toggle="tooltip" data-placement="bottom" data-original-title="View task" style="cursor: default;right: ' + $viewOption + ';" onclick="viewTask(\'' + list.task_id + '\', \'' + list.module + '\')"><i class="fas fa-eye" style="font-size: 13px;"></i></span><span class="info-box-text"><pre class="mt-1 px-2" style="white-space: pre-wrap;font-family: myFirstFont;font-size: inherit;padding: 0px;color: inherit;background: #0000001a;border-radius: 3px;">' + tasktitle + '</pre></span></div></div></div></div>';
+        // list.priority_color
+        if (list.priority == 0) {
+            var prioName = "LOW";
+        } else if (list.priority == 1) {
+            var prioName = "MEDIUM";
+        } else {
+            var prioName = "HIGH";
+        }
+
+        var prio = '<span class="badge badge-info bg-' + list.priority_color + '">' + prioName + '</span>';
+
+        return '<div class="col-md-12 col-sm-12 col-12" id="' + list.task_id + '"><div class="row"><div class="info-box" style="cursor: move;"><div class="info-box-content"><div class="mt-1">' + task_member + '</div><div class="d-flex" style="flex-direction: row;justify-content: space-between;"><div><small class="info-box-text mt-1"><i class="far fa-calendar-check"></i> <b>Due:</b> ' + list.date + '</small></div><div><small class="info-box-text mt-1"><b>Code:</b> ' + list.task_code + '</small></div></div>' + deleteOption + '<span class="badge navbar-badge" data-toggle="tooltip" data-placement="bottom" data-original-title="View task" style="cursor: default;right: ' + $viewOption + ';" onclick="viewTask(\'' + list.task_id + '\', \'' + list.module + '\')"><i class="fas fa-eye" style="font-size: 13px;"></i></span><span class="info-box-text"><pre class="mt-1 px-0" style="white-space: pre-wrap;font-family: myFirstFont;font-size: 14px;padding: 0px;color: inherit;background: transparent;border-radius: 3px;margin-bottom: 7px;">' + tasktitle + '</pre></span><span class="info-box-text mt-0 pt-0  mb-2">' + prio + '</span></div></div></div></div>';
     }
 
     function updateType(id, type) {

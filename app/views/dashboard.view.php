@@ -9,6 +9,11 @@ require 'layouts/head.php'; ?>
     .welcome-msg {
         margin-top: 10%;
     }
+
+    .table td,
+    .table th {
+        border-top: 0px solid #dee2e6;
+    }
 </style>
 
 <!-- Content Header (Page header) -->
@@ -42,46 +47,42 @@ require 'layouts/head.php'; ?>
                     <!-- /.card-header -->
                     <div class="card-body">
 
-                        <?php
-                        // dd(dueDateForthisWeek());
-                        foreach (dueDateForthisWeek() as $task) :
-                            if (!empty($task['projects'])) {
-                                $detail = (!empty($task['projects'][0]))
-                                    ? $task['projects'][0]
-                                    : $task['projects'];
+                        <table class="table table-sm">
+                            <tbody>
+                                <?php
+                                // dd(dueDateForthisWeek());
+                                foreach (dueDateForthisWeek() as $task) :
+                                    if (!empty($task['projects'])) {
+                                        $detail = (!empty($task['projects'][0]))
+                                            ? $task['projects'][0]
+                                            : $task['projects'];
 
-                                $priority_stats = ($task['priority_stats'] == 0)
-                                    ? "green"
-                                    : (($task['priority_stats'] == 1) ? "orange" : "red");
-                        ?>
-                                <div class="col-md-12 col-sm-12 col-12" id="<?= $task['task_id'] ?>">
-                                    <div class="row">
-                                        <div class="info-box bg-<?= $priority_stats ?>">
-                                            <div class="info-box-content">
-                                                <div class="d-flex" style="flex-direction: column;justify-content: space-between;">
-                                                    <div>
-                                                        <small class="info-box-text mt-1"><i class="far fa-calendar-check"></i> Due: <?= date('Y-m-d', strtotime($task['taskDueDate'])) ?></small>
-                                                    </div>
-                                                    <div>
-                                                        <small class="info-box-text mt-1">Task Code: <?= $task['task_code'] ?></small>
-
-                                                        <small class="info-box-text mt-1">Project : <?= $detail['projectName'] ?></small>
-                                                    </div>
+                                        $priority_stats = ($task['priority_stats'] == 0)
+                                            ? "green"
+                                            : (($task['priority_stats'] == 1) ? "orange" : "red");
+                                ?>
+                                        <tr>
+                                            <td class="d-flex" style="flex-direction: row;justify-content: space-between;">
+                                                <div>
+                                                    <span><?= html_entity_decode(substr($task['taskDescription'], 0, 70)) ?></span>
                                                 </div>
-                                                <span class="badge navbar-badge" data-toggle="tooltip" data-placement="bottom" data-original-title="View task" style="right: 5px;" onclick="window.location='project/<?= $task['projectCode'] ?>'">
-                                                    <i class="fas fa-eye" style="font-size: 13px;"></i>
-                                                </span>
-                                                <span class="info-box-text">
-                                                    <pre class="mt-1 px-2" style="white-space: pre-wrap;font-family: myFirstFont;font-size: inherit;padding: 0px;color: inherit;background: #00000029;border-radius: 3px;"><?= html_entity_decode($task['taskDescription']) ?></pre>
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                                <div>
 
-                        <?php }
-                        endforeach;
-                        ?>
+                                                    <span class="badge bg-danger">55%</span>
+                                                    <span><?= $detail['projectName'] ?></span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                <?php }
+                                endforeach;
+                                ?>
+                            </tbody>
+                        </table>
+
+
+
+
+
 
                     </div>
                     <!-- /.card-body -->

@@ -41,9 +41,43 @@ if (empty($_SESSION['system']['branch_id'])) {
 			src: url("<?= public_url('/assets/adminlte/fonts/Nunito-Regular.ttf') ?>");
 		}
 
+		.nav-link {
+			padding: 0.3rem;
+		}
+
+		.nav-sidebar>.nav-item .nav-icon {
+			font-size: 0.7rem !important;
+		}
+
+		.brand-link {
+			font-size: 14px;
+			padding: 0.7rem;
+			border-bottom: 0px solid #dee2e6 !important;
+		}
+
+		.info-box {
+			border: 1px solid #c9c9c9;
+		}
+
+		.main-header .nav-link {
+			height: 1.7rem;
+		}
+
+		.main-header {
+			border-bottom: 0px solid #dee2e6;
+		}
+
+		.main-footer {
+			border-top: 0px solid #dee2e6;
+		}
+
+		.layout-navbar-fixed .wrapper .content-wrapper {
+			margin-top: calc(2.6rem + 1px);
+		}
+
 		body {
 			/* font-weight: 300; */
-			font-size: 14px;
+			font-size: 12px;
 			/* font-family: "Open Sans"; */
 			color: #222222 !important;
 			background: #eef1f4;
@@ -236,7 +270,7 @@ if (empty($_SESSION['system']['branch_id'])) {
 			<!-- Right navbar links -->
 			<ul class="navbar-nav ml-auto">
 
-				<li class="nav-item dropdown" style="font-size: 19px;">
+				<li class="nav-item dropdown" style="font-size: 14px;">
 					<a class="nav-link" data-toggle="dropdown" href="#" aria-expanded="true">
 						<i class="far fa-bell"></i>
 						<span class="badge badge-warning navbar-badge">15</span>
@@ -263,7 +297,7 @@ if (empty($_SESSION['system']['branch_id'])) {
 					</div>
 				</li>
 
-				<li class="nav-item" style="font-size: 16px;">
+				<li class="nav-item" style="font-size: 14px;">
 
 					<a class="nav-link" href="<?= route('/profile') ?>" aria-expanded="true">
 						<i class="fas fa-user"></i>

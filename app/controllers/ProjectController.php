@@ -101,6 +101,7 @@ class ProjectController
 						"priority_color" => $prio,
 						"date"      => date('m/d/Y', strtotime($_task['taskDueDate'])),
 						"task_code" => $_task['task_code'],
+						"task_title" => html_entity_decode($_task['taskTitle']),
 						"task"      => html_entity_decode($_task['taskDescription']),
 						"task_member"   => getTaskMember($_task['projectCode'], $task['task_id']),
 						"allow_delete"  => allowDeleteTask($_task['projectCode'], $task['task_id']),
@@ -174,6 +175,7 @@ class ProjectController
 					"priority"      => $taskList['priority_stats'],
 					"date"          => date('Y-m-d', strtotime($taskList['taskDueDate'])),
 					"task_code"     => $taskList['task_code'],
+					"task_title"     => html_entity_decode($taskList['taskTitle']),
 					"task"          => html_entity_decode($taskList['taskDescription']),
 					"task_type"     => $type,
 					"task_member"   => getTaskMember($taskList['projectCode'], $taskList['task_id']),
@@ -192,6 +194,7 @@ class ProjectController
 
 		$taskDueDate = $request['due_date'];
 		$user_id = Auth::user('id');
+		$taskTitle = addslashes($request['task_title']);
 		$taskDescription = addslashes($request['taskDescription']);
 		$status = 0;
 		$priority_stats = $request['priority_status'];
@@ -201,6 +204,7 @@ class ProjectController
 
 		$data = [
 			'projectCode' => $projectCode,
+			'taskTitle' => $taskTitle,
 			'taskDescription' => $taskDescription,
 			'taskDueDate' => $taskDueDate,
 			'taskCreateDate' => date("Y-m-d H:i:s"),
@@ -229,6 +233,7 @@ class ProjectController
 		$task_code = $request['task_code'];
 
 		$data = array(
+			'taskTitle' => addslashes($request['task_title']),
 			'taskDescription'    => addslashes($request['task_desc']),
 			'taskDueDate'        => date("Y-m-d", strtotime($request['task_due_date'])),
 			'priority_stats'    => $request['task_prio']

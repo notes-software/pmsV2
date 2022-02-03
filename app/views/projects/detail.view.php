@@ -34,7 +34,7 @@ $isProjTl = isProjectTeamLeader($project['projectCode']);
     }
 
     .droptarget {
-        max-height: 600px;
+        height: 600px;
     }
 
     .ch-padd-hover:hover {
@@ -328,15 +328,16 @@ $isProjTl = isProjectTeamLeader($project['projectCode']);
         var hasUserID = $("#has_user_id").val();
         if (hasUserID != "") {
             $(function() {
-                $("#sortable1, #sortable2, #sortable3, #sortable3_today").sortable({
+                $("#sortable1, #sortable2, #sortable3, #sortable3_today, #sortable3_all").sortable({
                     connectWith: ".drops"
                 }).disableSelection();
             });
 
-            $("#sortable1, #sortable2, #sortable3, #sortable3_today").droppable({
+            $("#sortable1, #sortable2, #sortable3, #sortable3_today, #sortable3_all").droppable({
                 drop: function(event, ui) {
                     var draggableId = ui.draggable.attr("id");
                     var parent_id = event.target.id;
+                    console.log(draggableId);
 
                     if (parent_id == "sortable1") {
                         updateType(draggableId, 0);
@@ -374,11 +375,16 @@ $isProjTl = isProjectTeamLeader($project['projectCode']);
             }
         }
 
-        return '<div class="col-md-12 col-sm-12 col-12" id="' + list.task_id + '"><div class="row"><div class="info-box bg-' + list.priority_color + '" style="cursor: move;"><div class="info-box-content"><div class="mt-1">' + task_member + '</div><div class="d-flex" style="flex-direction: row;justify-content: space-between;"><div><small class="info-box-text mt-1"><i class="far fa-calendar-check"></i> <b>Due:</b> ' + list.date + '</small></div><div><small class="info-box-text mt-1"><b>Code:</b> ' + list.task_code + '</small></div></div>' + deleteOption + '<span class="badge navbar-badge" data-toggle="tooltip" data-placement="bottom" data-original-title="View task" style="cursor: default;right: ' + $viewOption + ';" onclick="viewTask(\'' + list.task_id + '\', \'' + list.module + '\')"><i class="fas fa-eye" style="font-size: 13px;"></i></span><span class="info-box-text"><pre class="mt-1 px-2" style="white-space: pre-wrap;font-family: myFirstFont;font-size: inherit;padding: 0px;color: inherit;background: #0000001a;border-radius: 3px;">' + list.task + '</pre></span></div></div></div></div>';
+        var shortTaskDesc = list.task.substring(0, 100);
+        var taskTitleLen = (list.task.length > 100) ? ' . . .' : '';
+        var tasktitle = (list.task_title != "") ? list.task_title : shortTaskDesc + taskTitleLen;
+
+        return '<div class="col-md-12 col-sm-12 col-12" id="' + list.task_id + '"><div class="row"><div class="info-box bg-' + list.priority_color + '" style="cursor: move;"><div class="info-box-content"><div class="mt-1">' + task_member + '</div><div class="d-flex" style="flex-direction: row;justify-content: space-between;"><div><small class="info-box-text mt-1"><i class="far fa-calendar-check"></i> <b>Due:</b> ' + list.date + '</small></div><div><small class="info-box-text mt-1"><b>Code:</b> ' + list.task_code + '</small></div></div>' + deleteOption + '<span class="badge navbar-badge" data-toggle="tooltip" data-placement="bottom" data-original-title="View task" style="cursor: default;right: ' + $viewOption + ';" onclick="viewTask(\'' + list.task_id + '\', \'' + list.module + '\')"><i class="fas fa-eye" style="font-size: 13px;"></i></span><span class="info-box-text"><pre class="mt-1 px-2" style="white-space: pre-wrap;font-family: myFirstFont;font-size: inherit;padding: 0px;color: inherit;background: #0000001a;border-radius: 3px;">' + tasktitle + '</pre></span></div></div></div></div>';
     }
 
     function updateType(id, type) {
         var project_code = "<?= $project['projectCode'] ?>";
+        console.log(project_code);
         $.post(base_url + "/project/task/update", {
             id: id,
             type: type,
@@ -428,6 +434,7 @@ $isProjTl = isProjectTeamLeader($project['projectCode']);
                     $("#v_task_status").html(tsk_dt.task_type);
                     $("#task_v_date").val(tsk_dt.date);
                     $("#v_task_prio_status").val(tsk_dt.priority);
+                    $("#v_task_title").val(tsk_dt.task_title);
                     $("#v_task_desc").html(tsk_dt.task);
 
                     if (tsk_dt.task_type != "DONE") {
@@ -469,6 +476,7 @@ $isProjTl = isProjectTeamLeader($project['projectCode']);
         var task_date = $("#task_date").val();
         var task_status = $("#task_status").val();
         var task_description = $("#task_description").html();
+        var task_title = $("#task_title").val();
         var project_code = "<?= $project['projectCode'] ?>";
         if (project_code == '') {
             alertMe('danger', 'No project selected!');
@@ -478,6 +486,7 @@ $isProjTl = isProjectTeamLeader($project['projectCode']);
             } else {
                 $.post(base_url + "/project/task/add", {
                     due_date: task_date,
+                    task_title: task_title,
                     taskDescription: task_description,
                     priority_status: task_status,
                     projectCode: project_code
@@ -497,11 +506,13 @@ $isProjTl = isProjectTeamLeader($project['projectCode']);
 
     function save_task_details() {
         var project_code = "<?= $project['projectCode'] ?>";
+        var task_title = $("#v_task_title").val();
         var task_desc = $("#v_task_desc").html();
         var task_due_date = $("#task_v_date").val();
         var task_code = $("#v_task_code").html();
         var task_prio = $("#v_task_prio_status").val();
         $.post(base_url + "/project/task/update/details", {
+            task_title: task_title,
             task_desc: task_desc,
             task_due_date: task_due_date,
             task_code: task_code,

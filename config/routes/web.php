@@ -58,7 +58,7 @@ Route::group(['prefix' => 'project', 'middleware' => ['auth']], function () {
     Route::group(['prefix' => '/task', 'middleware' => ['auth']], function () {
         Route::post('/', ['ProjectController@task']);
         Route::post('/update', ['ProjectController@updateTaskType']);
-        Route::post('/detail', ['ProjectController@taskDetail', 'auth']);
+        Route::post('/detail', ['ProjectController@taskDetail']);
         Route::post('/update/details', ['ProjectController@taskUpdate']);
         Route::post('/add', ['ProjectController@taskAdd']);
         Route::post('/delete', ['ProjectController@taskDelete']);

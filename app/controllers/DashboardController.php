@@ -31,7 +31,7 @@ class DashboardController
 
         $totalTask = 0;
         foreach ($projects as $project) {
-            $totalTask += getTotalTask($project['project_code']);
+            $totalTask += getTotalAllTask($project['project_code'], $user_id);
         }
 
         return view('/dashboard', compact('pageTitle', 'totalProjects', 'totalTask', 'totalInProgressTask'));

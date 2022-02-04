@@ -16,6 +16,14 @@ function getTotalTask($projectCode)
 	return count(getAllProjectTask($projectCode));
 }
 
+function getTotalAllTask($projectCode, $userid)
+{
+	$tasks = DB()->query("SELECT * from tasks as t, `task_member` as tm 
+	WHERE t.task_id = tm.task_id AND tm.projectCode = '$projectCode' AND tm.user_id = '$userid'", 'Y')->get();
+
+	return count($tasks);
+}
+
 function getTotalInProgressTask($projectCode, $userid)
 {
 	$tasks = DB()->query("SELECT * from tasks as t, `task_member` as tm 

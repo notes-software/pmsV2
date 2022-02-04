@@ -14,13 +14,22 @@ require 'layouts/head.php'; ?>
     .table th {
         border-top: 0px solid #dee2e6;
     }
+
+    .tasksSelect:hover {
+        padding: 3px;
+        background: #ebebeb;
+    }
 </style>
 
 <!-- Content Header (Page header) -->
 <section class="content-header">
-    <div class="row mb-2">
+    <div class="row mb-0">
         <div class="col-sm-6">
             <h1 class="m-0"><?= ucfirst($pageTitle) ?></h1>
+            <p class="text-muted" style="font-size: 14px;">
+                <span class="text-green"><?= date("l,") ?></span>
+                <?= date("M d, Y") ?>
+            </p>
         </div><!-- /.col -->
         <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
@@ -36,12 +45,74 @@ require 'layouts/head.php'; ?>
 <section class="content">
     <div class="container-fluid">
         <div class="row">
-            <div class="col-lg-7">
+            <div class="col-lg-12">
+                <div class="card pt-3" style="background: #e7f2ff;">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="row" style="display: flex;flex-direction: row;justify-content: center;justify-items: center;color: #fff;">
+                                    <div class="col-md-3">
+                                        <div class="card" style="background-image: radial-gradient(circle at 0 2%,#283e63,#172337 99%);">
+                                            <div class="card-body">
+                                                <div class="row">
+                                                    <div class="col-md-12 text-center">
+                                                        <h1><?= $totalProjects ?></h1>
+                                                        <div class="d-flex" style="flex-direction: column;">
+                                                            <span>PROJECTS</span>
+                                                            <small style="color: #c1bfbf;">[for you]</small>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="card" style="background-image: radial-gradient(circle at 0 2%,#283e63,#172337 99%);">
+                                            <div class="card-body">
+                                                <div class="row">
+                                                    <div class="col-md-12 text-center">
+                                                        <h1><?= $totalInProgressTask ?></h1>
+                                                        <div class="d-flex" style="flex-direction: column;">
+                                                            <span>TASK</span>
+                                                            <small style="color: #c1bfbf;">[in progress]</small>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="card" style="background-image: radial-gradient(circle at 0 2%,#283e63,#172337 99%);">
+                                            <div class="card-body">
+                                                <div class="row">
+                                                    <div class="col-md-12 text-center">
+                                                        <h1><?= $totalTask ?></h1>
+                                                        <div class="d-flex" style="flex-direction: column;">
+                                                            <span>TASK</span>
+                                                            <small style="color: #c1bfbf;">[to all projects]</small>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6" style="display: flex;flex-direction: column;justify-content: center;">
+                                <h1 style="font-weight:400;">Welcome back, <span class="text-muted"><?= Auth::user('fullname') ?></span></h1>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-8">
                 <div class="card">
                     <div class="card-header">
                         <h3 class="card-title">
-                            <i class="fas fa-bullhorn text-danger"></i>
-                            Due and Past Due Tasks ( <span class="text-success">IN PROGESS</span> )
+                            <i class="fas fa-bars text-dark"></i>
+                            <b class="ml-2">Today's Task</b>
                         </h3>
                     </div>
                     <!-- /.card-header -->
@@ -57,19 +128,35 @@ require 'layouts/head.php'; ?>
                                             ? $task['projects'][0]
                                             : $task['projects'];
 
-                                        $priority_stats = ($task['priority_stats'] == 0)
-                                            ? "green"
-                                            : (($task['priority_stats'] == 1) ? "orange" : "red");
+                                        $description = html_entity_decode($task['taskDescription']);
+                                        $shortTaskDesc = substr($description, 0, 50);
+                                        $taskTitleLen = (strlen($description) > 50) ? ' . . .' : '';
+                                        $tasktitle = ($task['taskTitle'] != "") ? $task['taskTitle'] : $shortTaskDesc . $taskTitleLen;
+
+                                        $projNameAcc = substr($detail['projectName'], 0, 13);
+                                        $shortProjName = (strlen($detail['projectName']) > 13) ? $projNameAcc . '...' : $projNameAcc;
+
+                                        if ($task['priority_stats'] == 0) {
+                                            $priority_stats = "green";
+                                            $prioName = "LOW";
+                                        } else if ($task['priority_stats'] == 1) {
+                                            $priority_stats = "orange";
+                                            $prioName = "MEDIUM";
+                                        } else {
+                                            $priority_stats = "red";
+                                            $prioName = "HIGH";
+                                        }
                                 ?>
-                                        <tr>
-                                            <td class="d-flex" style="flex-direction: row;justify-content: space-between;">
+                                        <tr class="tasksSelect">
+                                            <td class="d-flex" style="flex-direction: row;justify-content: space-between;cursor: pointer;" onclick="window.location='project/<?= $task['projectCode'] ?>'">
                                                 <div>
-                                                    <span><?= html_entity_decode(substr($task['taskDescription'], 0, 70)) ?></span>
+                                                    <span><?= $tasktitle ?></span>
                                                 </div>
                                                 <div>
 
-                                                    <span class="badge bg-danger">55%</span>
-                                                    <span><?= $detail['projectName'] ?></span>
+                                                    <span class="badge bg-<?= $priority_stats ?>"><?= $prioName ?></span>
+                                                    <span class="ml-2"><b><?= $shortProjName ?></b></span>
+                                                    <span class="ml-2 text-muted"><?= date('M d, Y', strtotime($task['taskDueDate'])) ?></span>
                                                 </div>
                                             </td>
                                         </tr>
@@ -88,18 +175,7 @@ require 'layouts/head.php'; ?>
                     <!-- /.card-body -->
                 </div>
             </div>
-            <div class="col-lg-5">
-
-                <div class="card">
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <span style="font-size: 16px;"><b>Welcome back</b>, <?= Auth::user('fullname') ?></span>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- /.card-body -->
-                </div>
+            <div class="col-lg-4">
 
                 <div class="card">
                     <div class="card-body">

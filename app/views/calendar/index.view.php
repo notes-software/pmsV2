@@ -143,6 +143,7 @@ require __DIR__ . '/../layouts/head.php'; ?>
         var task_date = $("#cal_task_date").val();
         var project = $("#cal_project").val();
         var task_status = $("#cal_task_status").val();
+        var task_title = $("#task_title").val();
         var task_description = $("#cal_task_description").html();
 
         if (task_status == '' || task_description == '') {
@@ -151,6 +152,7 @@ require __DIR__ . '/../layouts/head.php'; ?>
             $.post(base_url + "/mycalendar/tasks/add", {
                 created_date: created_date,
                 due_date: task_date,
+                task_title: task_title,
                 taskDescription: task_description,
                 priority_status: task_status,
                 projectCode: project
@@ -205,6 +207,7 @@ require __DIR__ . '/../layouts/head.php'; ?>
                     $("#v_task_status").html(tsk_dt.task_type);
                     $("#task_v_date").val(tsk_dt.date);
                     $("#v_task_prio_status").val(tsk_dt.priority);
+                    $("#v_task_title").val(tsk_dt.task_title);
                     $("#v_task_desc").html(tsk_dt.task);
 
                     $("#v_task_projectName").html(tsk_dt.projectName);
@@ -264,10 +267,12 @@ require __DIR__ . '/../layouts/head.php'; ?>
 
     function save_task_details(project_code) {
         var task_desc = $("#v_task_desc").html();
+        var task_title = $("#v_task_title").val();
         var task_due_date = $("#task_v_date").val();
         var task_code = $("#v_task_code").html();
         var task_prio = $("#v_task_prio_status").val();
         $.post(base_url + "/project/task/update/details", {
+            task_title: task_title,
             task_desc: task_desc,
             task_due_date: task_due_date,
             task_code: task_code,

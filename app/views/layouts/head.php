@@ -182,6 +182,26 @@ if (empty($_SESSION['system']['branch_id'])) {
 		.msg_chat_scroll_steady:hover {
 			overflow: auto;
 		}
+
+		.control-sidebar {
+			top: 0 !important;
+			bottom: 0 !important;
+		}
+
+		.cardNote {
+			border: 0.5px solid #a3a3a38f
+		}
+
+		.note-title {
+			background-color: transparent;
+			border: none;
+			padding: 0;
+			outline: none;
+			overflow: hidden;
+			resize: none;
+			vertical-align: top;
+			width: 100%;
+		}
 	</style>
 
 	<!-- jQuery -->
@@ -302,6 +322,12 @@ if (empty($_SESSION['system']['branch_id'])) {
 					<a class="nav-link" href="<?= route('/profile') ?>" aria-expanded="true">
 						<i class="fas fa-user"></i>
 						<span><?= Auth::user('fullname') ?></span>
+					</a>
+				</li>
+
+				<li class="nav-item">
+					<a class="nav-link" data-widget="control-sidebar" data-slide="true" href="#">
+						<i class="far fa-sticky-note" style="font-size: 16px;"></i>
 					</a>
 				</li>
 

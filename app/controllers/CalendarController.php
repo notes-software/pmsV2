@@ -116,6 +116,7 @@ class CalendarController
 					"projectName"   => (!empty(getProjectName($taskList['projectCode'], 'projectName'))) ? getProjectName($taskList['projectCode'], 'projectName') : 'PERSONAL',
 					"date"          => date('Y-m-d', strtotime($taskList['taskDueDate'])),
 					"task_code"     => $taskList['task_code'],
+					"task_title"    => html_entity_decode($taskList['taskTitle']),
 					"task"          => html_entity_decode($taskList['taskDescription']),
 					"task_type"     => $_type,
 					"task_member"   => getTaskMember($taskList['projectCode'], $taskList['task_id']),
@@ -135,6 +136,7 @@ class CalendarController
 		$created_date = $request['created_date'];
 		$taskDueDate = $request['due_date'];
 		$user_id = Auth::user('id');
+		$taskTitle = addslashes($request['task_title']);
 		$taskDescription = addslashes($request['taskDescription']);
 		$status = 1;
 		$priority_stats = $request['priority_status'];
@@ -144,6 +146,7 @@ class CalendarController
 
 		$data = [
 			'projectCode' => $projectCode,
+			'taskTitle' => $taskTitle,
 			'taskDescription' => $taskDescription,
 			'taskDueDate' => $taskDueDate,
 			'taskCreateDate' => $created_date,

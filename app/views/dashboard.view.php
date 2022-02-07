@@ -194,7 +194,7 @@ require 'layouts/head.php'; ?>
                         <div class="row">
                             <div class="col-md-12">
                                 <span style="font-size: 16px;">Current Version (v1.1)</span>
-                                <button type="button" class="btn btn-default btn-sm">What's new?</button>
+                                <button type="button" class="btn btn-default btn-sm" onclick="openChangeLog()">What's new?</button>
                             </div>
                         </div>
                     </div>
@@ -230,6 +230,17 @@ require 'layouts/head.php'; ?>
         }
 
         return '<div class="col-md-12 col-sm-12 col-12" id="' + list.task_id + '"><div class="row"><div class="info-box bg-' + list.priority_color + '"><div class="info-box-content"><div class="mt-1" style="cursor: default;">' + task_member + '</div><div class="d-flex" style="flex-direction: row;justify-content: space-between;"><div><small class="info-box-text mt-1"><i class="far fa-calendar-check"></i> Due: ' + list.date + '</small></div><div><small class="info-box-text mt-1">Code: ' + list.task_code + '</small></div></div>' + $deleteOption + '<span class="badge navbar-badge" data-toggle="tooltip" data-placement="bottom" data-original-title="View task" style="right: ' + $viewOption + ';" onclick="viewTask(\'' + list.task_id + '\', \'' + list.module + '\')"><i class="fas fa-eye" style="font-size: 13px;"></i></span><span class="info-box-text"><pre class="mt-1" style="white-space: pre-wrap;font-family: myFirstFont;font-size: inherit;padding: 0px;color: inherit;background: inherit;background : transparent;">' + list.task + '</pre></span></div></div></div></div>';
+    }
+
+    function openChangeLog() {
+        $.get(base_url + "/whatsnew", {}, function(data) {
+            $("#cl-content").html(data);
+            $("#modal-change-log").modal({
+                show: true,
+                backdrop: 'static',
+                keyboard: false
+            });
+        });
     }
 </script>
 

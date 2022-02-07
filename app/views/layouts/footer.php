@@ -15,16 +15,17 @@
 
 <?php include_once __DIR__ . '/../create_note_modal.php'; ?>
 <?php include_once __DIR__ . '/../edit_note_modal.php'; ?>
+<?php include_once __DIR__ . '/../changelog.view.php'; ?>
 
 <!-- Control Sidebar -->
 <aside class="control-sidebar control-sidebar-light">
     <!-- Control sidebar content goes here -->
-    <div style="margin-top: calc(2.9rem + 3px); color: #222222;">
+    <div style="margin-top: calc(2.9rem + 5px); color: #222222;">
         <div class="col-md-12">
             <div style="display: flex;flex-direction: row;justify-content: end;align-items: center;">
 
-                <div class="btn-group">
-                    <input type="search" class="form-control form-control-sm" id="notes_search_input" placeholder="search your notes" onkeyup="searchInNotes()">
+                <div class="btn-group" style="width: 100%;">
+                    <input type="search" class="form-control form-control-sm" id="notes_search_input" placeholder="search your notes" onkeyup="searchInNotes()" autocomplete="off">
                 </div>
                 <div class="btn-group ml-1">
                     <a onclick="addNote()" class="btn btn-default btn-xs" data-toggle="tooltip" data-placement="bottom" data-original-title="Add New Note"><i class="far fa-plus-square p-1"></i></a>

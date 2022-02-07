@@ -75,6 +75,10 @@ if (empty($_SESSION['system']['branch_id'])) {
 			margin-top: calc(2.6rem + 1px);
 		}
 
+		.layout-navbar-fixed.layout-fixed .wrapper .sidebar {
+			margin-top: calc(2.6rem + 1px);
+		}
+
 		body {
 			/* font-weight: 300; */
 			font-size: 12px;
@@ -92,6 +96,19 @@ if (empty($_SESSION['system']['branch_id'])) {
 			padding-left: 1rem;
 		}
 
+		.navbar-expand .navbar-nav {
+			align-items: baseline;
+		}
+
+		.navbar-expand .navbar-nav .nav-link {
+			padding-right: 0.6rem;
+			padding-left: 0.6rem;
+		}
+
+		.navbar-badge {
+			right: 0px;
+		}
+
 		.table td,
 		.table th {
 			font-size: 14px;
@@ -100,6 +117,7 @@ if (empty($_SESSION['system']['branch_id'])) {
 
 		.content-wrapper {
 			height: auto !important;
+			/* background-color: #ffffff; */
 			min-height: calc(100vh - 57px) !important;
 		}
 
@@ -201,6 +219,21 @@ if (empty($_SESSION['system']['branch_id'])) {
 			resize: none;
 			vertical-align: top;
 			width: 100%;
+		}
+
+		.noteEditor {
+			font-size: 20px;
+			font-family: inherit;
+			white-space: pre-wrap;
+			outline: none;
+			-webkit-user-modify: read-write-plaintext-only;
+		}
+
+		[contenteditable][placeholder]:empty:before {
+			content: attr(placeholder);
+			position: absolute;
+			color: gray;
+			background-color: transparent;
 		}
 	</style>
 
@@ -320,13 +353,12 @@ if (empty($_SESSION['system']['branch_id'])) {
 				<li class="nav-item" style="font-size: 14px;">
 
 					<a class="nav-link" href="<?= route('/profile') ?>" aria-expanded="true">
-						<i class="fas fa-user"></i>
-						<span><?= Auth::user('fullname') ?></span>
+						<div class="mt-1"><img src="<?= getUserAvatar(Auth::user('id')) ?>" style="width:20px;height: 20px;object-fit: cover;margin-left: 1px;margin-right: 2px;cursor: default;" class="rounded-circle"><span><?= Auth::user('fullname') ?></span></div>
 					</a>
 				</li>
 
 				<li class="nav-item">
-					<a class="nav-link" data-widget="control-sidebar" data-slide="true" href="#">
+					<a class="nav-link" data-widget="control-sidebar" data-slide="true" href="#" data-toggle="tooltip" data-placement="bottom" data-original-title="Notebook">
 						<i class="far fa-sticky-note" style="font-size: 16px;"></i>
 					</a>
 				</li>

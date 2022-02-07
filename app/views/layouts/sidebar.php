@@ -17,8 +17,10 @@ use App\Core\Request;
 	<div class="sidebar">
 
 		<!-- Sidebar Menu -->
-		<nav class="mt-2">
+		<nav>
 			<ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+
+				<li class="nav-header text-muted"><small><?= strtoupper(Auth::user('email')) ?></small></li>
 
 				<?=
 				showMenus([

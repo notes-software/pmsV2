@@ -42,21 +42,6 @@ require __DIR__ . '/../layouts/head.php'; ?>
             column-count: 4;
         }
     }
-
-    .noteEditor {
-        font-size: 20px;
-        font-family: inherit;
-        white-space: pre-wrap;
-        outline: none;
-        -webkit-user-modify: read-write-plaintext-only;
-    }
-
-    [contenteditable][placeholder]:empty:before {
-        content: attr(placeholder);
-        position: absolute;
-        color: gray;
-        background-color: transparent;
-    }
 </style>
 
 <!-- Content Header (Page header) -->

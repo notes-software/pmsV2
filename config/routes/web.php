@@ -11,7 +11,7 @@
  */
 
 use App\Core\Routing\Route;
-use App\Core\Request;
+use App\Core\Parsedown;
 
 Route::get('/', function () {
     return redirect('/login');
@@ -118,6 +118,12 @@ Route::group(['prefix' => 'settings', 'middleware' => ['auth']], function () {
         Route::post('/update', ['SettingsController@userUpdate']);
         Route::post('/delete', ['SettingsController@userDestroy']);
     });
+});
+
+Route::get('/whatsnew', function () {
+    $pd = new Parsedown();
+    $mdContent = file_get_contents('app/views/whats_new/new.md');
+    echo $pd->text($mdContent);
 });
 
 Route::get('/test', function () {

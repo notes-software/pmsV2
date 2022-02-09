@@ -33,7 +33,7 @@
             </div>
         </div>
 
-        <div class="col-md-12 mt-2 msg_chat_scroll_steady" id="note_container" style="height: 590px;">
+        <div class="col-md-12 mt-2 msg_chat_scroll_steady" id="note_container" style="height: calc(100vh - 10%);">
 
         </div>
     </div>

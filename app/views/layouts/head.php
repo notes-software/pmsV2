@@ -84,7 +84,7 @@ if (empty($_SESSION['system']['branch_id'])) {
 			font-size: 12px;
 			/* font-family: "Open Sans"; */
 			color: #222222 !important;
-			background: #eef1f4;
+			background: #fff;
 		}
 
 		.select2-container .select2-selection--single {

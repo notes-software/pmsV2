@@ -10,7 +10,7 @@ class NotebookController
 {
 	public function index()
 	{
-		// abort_if(gate_denies('branch_access'), '403 Forbidden');
+		// abort_if(gate_denies('branch_access'), 403);
 
 		$pageTitle = "Notebook";
 

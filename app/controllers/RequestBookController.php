@@ -9,7 +9,7 @@ class RequestBookController
 {
 	public function index()
 	{
-		// abort_if(gate_denies('branch_access'), '403 Forbidden');
+		// abort_if(gate_denies('branch_access'), 403);
 
 		$pageTitle = "Request Book";
 
@@ -96,7 +96,7 @@ class RequestBookController
 
 	public function store()
 	{
-		abort_if(gate_denies('branch_create'), '403 Forbidden');
+		abort_if(gate_denies('branch_create'), 403);
 
 		$request = Request::validate('/branch', [
 			'branch_name' => ['required']
@@ -112,7 +112,7 @@ class RequestBookController
 
 	public function edit($id)
 	{
-		abort_if(gate_denies('branch_edit'), '403 Forbidden');
+		abort_if(gate_denies('branch_edit'), 403);
 
 		$pageTitle = "Branch";
 
@@ -143,7 +143,7 @@ class RequestBookController
 
 	public function destroy()
 	{
-		abort_if(gate_denies('branch_delete'), '403 Forbidden');
+		abort_if(gate_denies('branch_delete'), 403);
 
 		foreach ($_REQUEST['id'] as $id) {
 			DB()->delete("branch", "id = '$id'");

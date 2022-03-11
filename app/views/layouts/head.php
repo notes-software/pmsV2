@@ -235,6 +235,12 @@ if (empty($_SESSION['system']['branch_id'])) {
 			color: gray;
 			background-color: transparent;
 		}
+
+		.sidebar-dark-primary .nav-sidebar>.nav-item>.nav-link.active,
+		.sidebar-light-primary .nav-sidebar>.nav-item>.nav-link.active {
+			background-color: #2c3e50;
+			color: #fff;
+		}
 	</style>
 
 	<!-- jQuery -->

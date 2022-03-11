@@ -9,7 +9,7 @@ class ProjectController
 {
 	public function index()
 	{
-		// abort_if(gate_denies('branch_access'), '403 Forbidden');
+		// abort_if(gate_denies('branch_access'), 403);
 
 		$pageTitle = "Projects";
 		$user_id = Auth::user('id');

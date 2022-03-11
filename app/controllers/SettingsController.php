@@ -8,7 +8,7 @@ class SettingsController
 {
     public function permissionIndex()
     {
-        abort_if(gate_denies('settings_access'), '403 Forbidden');
+        abort_if(gate_denies('settings_access'), 403);
 
         $pageTitle = "Permission";
         $branch = $_SESSION['system']['branch_id'];
@@ -70,7 +70,7 @@ class SettingsController
 
     public function rolesIndex()
     {
-        abort_if(gate_denies('settings_access'), '403 Forbidden');
+        abort_if(gate_denies('settings_access'), 403);
 
         $pageTitle = "Roles";
         $branch = $_SESSION['system']['branch_id'];
@@ -154,7 +154,7 @@ class SettingsController
 
     public function userIndex()
     {
-        abort_if(gate_denies('settings_access'), '403 Forbidden');
+        abort_if(gate_denies('settings_access'), 403);
 
         $pageTitle = "Users";
         $branch = $_SESSION['system']['branch_id'];

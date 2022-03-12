@@ -49,7 +49,7 @@ require 'layouts/head.php'; ?>
                 <div class="card pt-3" style="background: #e7f2ff;">
                     <div class="card-body">
                         <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-7">
                                 <div class="row" style="display: flex;flex-direction: row;justify-content: center;justify-items: center;color: #fff;">
                                     <div class="col-md-3">
                                         <div class="card" style="background-image: radial-gradient(circle at 0 2%,#283e63,#172337 99%);">
@@ -98,7 +98,7 @@ require 'layouts/head.php'; ?>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-6" style="display: flex;flex-direction: column;justify-content: center;">
+                            <div class="col-md-5" style="display: flex;flex-direction: column;justify-content: center;">
                                 <h1 style="font-weight:400;">Welcome back, <span class="text-muted"><?= Auth::user('fullname') ?></span></h1>
                             </div>
                         </div>

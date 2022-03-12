@@ -81,7 +81,7 @@ if (empty($_SESSION['system']['branch_id'])) {
 
 		body {
 			/* font-weight: 300; */
-			font-size: 12px;
+			font-size: 14px;
 			/* font-family: "Open Sans"; */
 			color: #222222 !important;
 			background: #fff;
@@ -238,8 +238,16 @@ if (empty($_SESSION['system']['branch_id'])) {
 
 		.sidebar-dark-primary .nav-sidebar>.nav-item>.nav-link.active,
 		.sidebar-light-primary .nav-sidebar>.nav-item>.nav-link.active {
-			background-color: #2c3e50;
-			color: #fff;
+			/* background-color: #2c3e50;
+			color: #fff; */
+			background-color: rgba(0, 0, 0, .1);
+			color: #212529;
+			box-shadow: none;
+		}
+
+		.nav-sidebar .nav-link>.right,
+		.nav-sidebar .nav-link>p>.right {
+			top: 10px;
 		}
 	</style>
 

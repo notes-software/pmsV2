@@ -310,8 +310,6 @@ function dueDateForthisWeek()
 		])
 		->get();
 
-	dd($tasks);
-
 	return $tasks;
 }
 

@@ -9,7 +9,7 @@ class RequestBookController
 {
 	public function index()
 	{
-		// abort_if(gate_denies('branch_access'), 403);
+		abort_if(gate_denies('request_book_access'), 403);
 
 		$pageTitle = "Request Book";
 
@@ -86,13 +86,6 @@ class RequestBookController
 		ob_flush();
 		flush();
 	}
-
-
-
-
-
-
-
 
 	public function store()
 	{

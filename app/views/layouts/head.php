@@ -43,6 +43,7 @@ if (empty($_SESSION['system']['branch_id'])) {
 
 		.nav-link {
 			padding: 0.3rem;
+			font-weight: 500;
 		}
 
 		.nav-sidebar>.nav-item .nav-icon {
@@ -303,10 +304,9 @@ if (empty($_SESSION['system']['branch_id'])) {
 		}
 
 		function alertMe(type, msg) {
-			Toast.fire({
-				type: type,
-				title: msg
-			});
+			type = (typeof type === 'undefined') ? 'info' : type;
+			toastr.options.timeOut = 2500;
+			toastr[type](msg);
 		}
 
 		function failed_query() {
@@ -337,7 +337,7 @@ if (empty($_SESSION['system']['branch_id'])) {
 			<!-- Right navbar links -->
 			<ul class="navbar-nav ml-auto">
 
-				<li class="nav-item dropdown" style="font-size: 14px;">
+				<!-- <li class="nav-item dropdown" style="font-size: 14px;">
 					<a class="nav-link" data-toggle="dropdown" href="#" aria-expanded="true">
 						<i class="far fa-bell"></i>
 						<span class="badge badge-warning navbar-badge">15</span>
@@ -362,7 +362,7 @@ if (empty($_SESSION['system']['branch_id'])) {
 						<div class="dropdown-divider"></div>
 						<a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>
 					</div>
-				</li>
+				</li> -->
 
 				<li class="nav-item" style="font-size: 14px;">
 

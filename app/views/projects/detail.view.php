@@ -7,6 +7,8 @@ require __DIR__ . '/../layouts/head.php';
 
 $isProjPm = isProjectManager($project['projectCode']);
 $isProjTl = isProjectTeamLeader($project['projectCode']);
+
+$proj_percentage = getProjectPercentage(getFinishTask($project['projectCode']), getTotalTask($project['projectCode']));
 ?>
 
 <style>
@@ -51,7 +53,7 @@ $isProjTl = isProjectTeamLeader($project['projectCode']);
     <div class="row">
         <div class="col-sm-6">
             <h1 class="m-0" style="color: #000; font-family: 'myFirstFont';"><?= ucfirst($pageTitle) ?></h1>
-            <p class="text-muted" style="font-size: 12px;">[ <span style="color: #000; font-weight: 400;"><?= $project['projectCode'] ?></span> ] <?= $project['projectDescription'] ?></p>
+            <p class="text-muted" style="font-size: 12px;">[ <span style="color: #000; font-weight: 400;"><?= $project['projectCode'] ?></span> ] <strong><?= $proj_percentage . "%" ?></strong> | <?= $project['projectDescription'] ?></p>
         </div><!-- /.col -->
         <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
@@ -76,9 +78,7 @@ $isProjTl = isProjectTeamLeader($project['projectCode']);
                     <div class="align-left">
                         <a href="<?= route('/project') ?>" class="btn btn-default btn-sm" data-toggle="tooltip" data-placement="bottom" data-original-title="Go back"><i class="fas fa-arrow-left p-1"></i></a>
 
-                        <?php if (isProjectManager($project['projectCode']) == 1 || isProjectTeamLeader($project['projectCode']) == 1) { ?>
-                            <a href="<?= route('/project/settings', $project['projectCode']) ?>" class="btn btn-default btn-sm" data-toggle="tooltip" data-placement="bottom" data-original-title="Project Settings"><i class="fas fa-cog p-1"></i></a>
-                        <?php } ?>
+                        <a href="<?= route('/project/settings', $project['projectCode']) ?>" class="btn btn-default btn-sm" data-toggle="tooltip" data-placement="bottom" data-original-title="Project Settings"><i class="fas fa-cog p-1"></i></a>
 
                         <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#add_task_modal">New Task</button>
                     </div>
@@ -86,7 +86,7 @@ $isProjTl = isProjectTeamLeader($project['projectCode']);
 
                 <div class="card-title">
                     <?php if (isProjectManager($project['projectCode']) == 1 || isProjectTeamLeader($project['projectCode']) == 1) { ?>
-                        <select class="form-control-sm select2 " name="myproj-member-selected" id="myproj-member-selected" tabindex="-1" aria-hidden="true" onchange="displayUserTask()">
+                        <select class="form-control-sm select2 " name="myproj-member-selected" id="myproj-member-selected" aria-hidden="true" onchange="displayUserTask()">
                             <option value="">-- select member --</option>
                             <?php
                             if (count($projectMembers) > 0) {
@@ -144,21 +144,6 @@ $isProjTl = isProjectTeamLeader($project['projectCode']);
 
                 <!-- DONE -->
                 <div class="col-md-4 col-sm-6 col-12">
-                    <!-- <div class="card cardDropOffs">
-                        <div class="card-header">
-                            <div style="display: flex;flex-direction: row;justify-content: space-between;align-items: center;">
-
-                                <div class="card-tools">
-                                    <div>
-                                        DONE
-                                        <span class="badge badge-secondary navbar-badge">15</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card-body p-2 drops droptarget msg_chat_scroll" id="sortable3">
-                        </div>
-                    </div> -->
 
                     <div class="card cardDropOffs">
                         <div class="card-header pb-0 pt-1 h-full">
@@ -201,41 +186,6 @@ $isProjTl = isProjectTeamLeader($project['projectCode']);
     $(function() {
         displayUserTask();
     });
-
-    function editBranch(id) {
-        $.post(base_url + "/branch/view/" + id, {}, function(data) {
-            var branch = JSON.parse(data);
-            $("#u_branch_name").val(branch.name);
-            $("#u_branch_id").val(branch.id);
-            $("#edit_branch_modal").modal('show');
-        });
-    }
-
-    function deleteBranch() {
-        var checkedValues = $('input:checkbox:checked').map(function() {
-            return this.value;
-        }).get();
-
-        id = [];
-        if (checkedValues == "") {
-            alertMe("warning", "No Selected Branch");
-        } else {
-            var retVal = confirm("Are you sure to delete?");
-            if (retVal) {
-                $("#delete_branch_btn").prop('disabled', true);
-                $("#delete_branch_btn").html("<span class='fa fa-spin fa-spinner'></span> Loading ...");
-
-                $.post(base_url + "/branch/delete", {
-                    id: checkedValues
-                }, function(data) {
-                    $("#delete_branch_btn").prop('disabled', true);
-                    $("#delete_branch_btn").html("Delete selected branch");
-
-                    location.reload();
-                });
-            }
-        }
-    }
 
     function displayUserTask() {
         var project_code = "<?= $project['projectCode'] ?>";
@@ -337,7 +287,7 @@ $isProjTl = isProjectTeamLeader($project['projectCode']);
                 drop: function(event, ui) {
                     var draggableId = ui.draggable.attr("id");
                     var parent_id = event.target.id;
-                    console.log(draggableId);
+                    // console.log(draggableId);
 
                     if (parent_id == "sortable1") {
                         updateType(draggableId, 0);
@@ -395,7 +345,7 @@ $isProjTl = isProjectTeamLeader($project['projectCode']);
 
     function updateType(id, type) {
         var project_code = "<?= $project['projectCode'] ?>";
-        console.log(project_code);
+        // console.log(project_code);
         $.post(base_url + "/project/task/update", {
             id: id,
             type: type,
@@ -441,8 +391,13 @@ $isProjTl = isProjectTeamLeader($project['projectCode']);
                     $("#task-search-result").html("");
                     $("#taskSearchMember").val("");
 
+                    var taskType_ = (tsk_dt.task_type == "DONE") ?
+                        tsk_dt.task_type +
+                        " @ " + tsk_dt.finishDate :
+                        tsk_dt.task_type;
+
                     $("#v_task_code").html(tsk_dt.task_code);
-                    $("#v_task_status").html(tsk_dt.task_type);
+                    $("#v_task_status").html(taskType_);
                     $("#task_v_date").val(tsk_dt.date);
                     $("#v_task_prio_status").val(tsk_dt.priority);
                     $("#v_task_title").val(tsk_dt.task_title);
@@ -492,7 +447,7 @@ $isProjTl = isProjectTeamLeader($project['projectCode']);
         if (project_code == '') {
             alertMe('danger', 'No project selected!');
         } else {
-            if (task_status == '' || task_description == '') {
+            if (task_status == '' || task_description == '' || task_title == '') {
                 alertMe("warning", "Some of the fields is blank, please fill in the fields.");
             } else {
                 $.post(base_url + "/project/task/add", {
@@ -522,25 +477,30 @@ $isProjTl = isProjectTeamLeader($project['projectCode']);
         var task_due_date = $("#task_v_date").val();
         var task_code = $("#v_task_code").html();
         var task_prio = $("#v_task_prio_status").val();
-        $.post(base_url + "/project/task/update/details", {
-            task_title: task_title,
-            task_desc: task_desc,
-            task_due_date: task_due_date,
-            task_code: task_code,
-            task_prio: task_prio,
-            project_code: project_code
-        }, function(data) {
-            if (data == 1) {
-                alertMe("success", "Task updated");
-            } else {
-                alertMe("danger", "Something went wrong!");
-            }
 
-            displayUserTask();
-            var task_id = $("#task_v_id").val();
-            var task_type = $("#v_task_status").html();
-            getTaskDetails(task_id, task_type);
-        });
+        if (task_due_date == '' || task_title == '') {
+            alertMe("warning", "Some of the fields is blank, please fill in the fields.");
+        } else {
+            $.post(base_url + "/project/task/update/details", {
+                task_title: task_title,
+                task_desc: task_desc,
+                task_due_date: task_due_date,
+                task_code: task_code,
+                task_prio: task_prio,
+                project_code: project_code
+            }, function(data) {
+                if (data == 1) {
+                    alertMe("success", "Task updated");
+                } else {
+                    alertMe("danger", "Something went wrong!");
+                }
+
+                displayUserTask();
+                var task_id = $("#task_v_id").val();
+                var task_type = $("#v_task_status").html();
+                getTaskDetails(task_id, task_type);
+            });
+        }
     }
 
     function deletetask(id) {

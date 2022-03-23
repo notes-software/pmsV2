@@ -151,7 +151,7 @@ require __DIR__ . '/../layouts/head.php'; ?>
         var task_title = $("#task_title").val();
         var task_description = $("#cal_task_description").html();
 
-        if (task_status == '' || task_description == '') {
+        if (task_status == '' || task_description == '' || task_title == '') {
             alertMe("warning", "Some of the fields is blank, please fill in the fields.");
         } else {
             $.post(base_url + "/mycalendar/tasks/add", {

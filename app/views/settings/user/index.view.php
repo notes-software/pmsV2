@@ -33,7 +33,7 @@ require __DIR__ . '/../../layouts/head.php'; ?>
                         <div class="card-tools">
                             <div class="align-left">
                                 <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#create_users_modal">Add user</button>
-                                <button type="button" id="delete_users_btn" class="btn btn-default btn-sm" onclick="deletePermission()">Delete selected user</button>
+                                <button type="button" id="delete_users_btn" class="btn btn-default btn-sm" onclick="deleteUser()">Delete selected user</button>
                             </div>
                         </div>
                     </div>
@@ -100,25 +100,25 @@ require __DIR__ . '/../../layouts/head.php'; ?>
         });
     }
 
-    function deletePermission() {
+    function deleteUser() {
         var checkedValues = $('input:checkbox:checked').map(function() {
             return this.value;
         }).get();
 
         id = [];
         if (checkedValues == "") {
-            alertMe("warning", "No Selected Permission");
+            alertMe("warning", "No Selected User");
         } else {
             var retVal = confirm("Are you sure to delete?");
             if (retVal) {
-                $("#delete_permission_btn").prop('disabled', true);
-                $("#delete_permission_btn").html("<span class='fa fa-spin fa-spinner'></span> Loading ...");
+                $("#delete_users_btn").prop('disabled', true);
+                $("#delete_users_btn").html("<span class='fa fa-spin fa-spinner'></span> Loading ...");
 
-                $.post(base_url + "/settings/permission/delete", {
+                $.post(base_url + "/settings/users/delete", {
                     id: checkedValues
                 }, function(data) {
-                    $("#delete_permission_btn").prop('disabled', true);
-                    $("#delete_permission_btn").html("Delete selected permission");
+                    $("#delete_users_btn").prop('disabled', true);
+                    $("#delete_users_btn").html("Delete selected permission");
 
                     location.reload();
                 });

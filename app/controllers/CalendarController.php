@@ -10,7 +10,7 @@ class CalendarController
 {
 	public function index()
 	{
-		// abort_if(gate_denies('branch_access'), 403);
+		abort_if(gate_denies('calendar_access'), 403);
 
 		$pageTitle = "My Calendar";
 		$user_id = Auth::user('id');

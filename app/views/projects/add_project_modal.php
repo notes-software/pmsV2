@@ -15,6 +15,14 @@
                             <input type="text" id="project_name_modal" class="form-control form-control-alternative" placeholder="My awesome project" autocomplete="off">
                         </div>
                         <div class="form-group">
+                            <label for="project_cost">Cost Estimate</label>
+                            <input type="number" id="project_cost" class="form-control form-control-alternative" autocomplete="off">
+                        </div>
+                        <div class="form-group">
+                            <label for="project_deadline">Deadline</label>
+                            <input type="date" id="project_deadline" class="form-control form-control-alternative" autocomplete="off">
+                        </div>
+                        <div class="form-group">
                             <label for="project_description_modal">Project description (optional)</label>
                             <textarea class="form-control form-control-alternative" id="project_description_modal" rows="4" placeholder="Description format" style="resize: none;"></textarea>
                         </div>

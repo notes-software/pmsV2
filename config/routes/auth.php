@@ -20,6 +20,7 @@ Route::group(['prefix' => 'profile', 'middleware' => ['auth']], function () {
     Route::post('/{user_id}', ['ProfileController@update']);
     Route::post('/changepass', ['ProfileController@changePass']);
     Route::post('/delete/{user_id}', ['ProfileController@destroy']);
+    Route::post('/uploadAvatar', ['ProfileController@uploadAvatar']);
 });
 
 Route::group(['prefix' => 'forgot/password'], function () {

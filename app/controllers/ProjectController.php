@@ -9,7 +9,7 @@ class ProjectController
 {
 	public function index()
 	{
-		// abort_if(gate_denies('branch_access'), 403);
+		abort_if(gate_denies('project_access'), 403);
 
 		$pageTitle = "Projects";
 		$user_id = Auth::user('id');
@@ -25,17 +25,23 @@ class ProjectController
 
 	public function store()
 	{
+		abort_if(gate_denies('project_add_access'), 403);
+
 		$request = Request::validate('/project');
 
 		$user_id = Auth::user('id');
 		$project_name = $request['project_name'];
 		$project_description = $request['project_description'];
+		$project_cost = $request['project_cost'];
+		$project_deadline = $request['project_deadline'];
 		$projectCode = randChar(10);
 
 		$data = array(
 			'projectCode' => $projectCode,
 			'projectName' => $project_name,
 			'projectDescription' => $project_description,
+			'projectCost' => $project_cost,
+			'projectDeadline' => date('Y-m-d H:i:s', strtotime($project_deadline)),
 			'proj_pm' => $user_id
 		);
 		$result = DB()->insert("projects", $data);
@@ -67,9 +73,6 @@ class ProjectController
 		$response['inprogress'] = [];
 		$response['done'] = [];
 		$tasks = getUserTask($request['project_code'], $request['memberSelected']);
-
-		// var_dump($tasks);
-		// die();
 
 		foreach ($tasks as $task) {
 			if (!empty($task['tasks'])) {
@@ -141,21 +144,25 @@ class ProjectController
 				'status' => $task_type,
 				"finishDate" => date("Y-m-d H:i:s")
 			);
+		} else {
+			$data = array(
+				'status' => $task_type,
+			);
 		}
 
 		$result = DB()->update("tasks", $data, "task_id = '$task_id'");
 		if ($result) {
-			if ($task_type != 0) {
-				if ($task_type == 1) {
-					$types = "ongoing";
-				} else if ($task_type == 2) {
-					$types = "done";
-				}
-				$msg = Auth::user('fullname') . " updated a task [" . $task_code["task_code"] . "] to " . $types;
-				$module = "Task";
-				$user_id = Auth::user('id');
-				log_activity($msg, $module, $user_id, $task_code['task_code']);
+			if ($task_type == 1) {
+				$types = "ongoing";
+			} else if ($task_type == 2) {
+				$types = "done";
+			} else {
+				$types = "todo";
 			}
+			$msg = Auth::user('fullname') . " updated a task [" . $task_code["task_code"] . "] to " . $types;
+			$module = "Task";
+			$user_id = Auth::user('id');
+			log_activity($msg, $module, $user_id, $task_code['task_code']);
 		}
 	}
 
@@ -174,8 +181,9 @@ class ProjectController
 					"task_id"       => $taskList['task_id'],
 					"priority"      => $taskList['priority_stats'],
 					"date"          => date('Y-m-d', strtotime($taskList['taskDueDate'])),
+					"finishDate"    => date('Y-m-d', strtotime($taskList['finishDate'])),
 					"task_code"     => $taskList['task_code'],
-					"task_title"     => html_entity_decode($taskList['taskTitle']),
+					"task_title"    => html_entity_decode($taskList['taskTitle']),
 					"task"          => html_entity_decode($taskList['taskDescription']),
 					"task_type"     => $type,
 					"task_member"   => getTaskMember($taskList['projectCode'], $taskList['task_id']),
@@ -343,6 +351,12 @@ class ProjectController
 
 		$response['proj_member'] = array();
 
+		if (isProjectManager($projCode) == 1 || isProjectTeamLeader($projCode) == 1) {
+			$allowDelete = 1;
+		} else {
+			$allowDelete = 0;
+		}
+
 		$loop_mem = getProjectMember($projCode);
 		if (count($loop_mem) < 1) {
 			echo "invite member to this project";
@@ -354,6 +368,7 @@ class ProjectController
 					"id" => $memList['user_id'],
 					"name" => $memList["memberName"],
 					"avatar" => $user_avatar,
+					"allowDelete" => $allowDelete
 				);
 				array_push($response['proj_member'], $members);
 			}
@@ -364,6 +379,8 @@ class ProjectController
 
 	public function memberDelete()
 	{
+		abort_if(gate_denies('project_update_settings_access'), 403);
+
 		$request = Request::validate('/project/settings/' . $_REQUEST['projCode']);
 
 		$projectCode = $request["projCode"];
@@ -478,6 +495,8 @@ class ProjectController
 
 	public function delete()
 	{
+		abort_if(gate_denies('project_update_settings_access'), 403);
+
 		$request = Request::validate('/project/settings/' . $_REQUEST['projCode']);
 		$projectCode = $request['projCode'];
 
@@ -501,6 +520,7 @@ class ProjectController
 	public function finish()
 	{
 		// close a project
+		abort_if(gate_denies('project_update_settings_access'), 403);
 
 		$request = Request::validate('/project/settings/' . $_REQUEST['projectCode']);
 
@@ -516,6 +536,8 @@ class ProjectController
 
 	public function saveInvite()
 	{
+		abort_if(gate_denies('project_update_settings_access'), 403);
+
 		$request = Request::validate('/project/settings/' . $_REQUEST['projCode']);
 		$projectCode = $request['projCode'];
 		$inviteID = $request['id'];
@@ -532,6 +554,8 @@ class ProjectController
 
 	public function saveGroupInvite()
 	{
+		abort_if(gate_denies('project_update_settings_access'), 403);
+
 		$request = Request::validate('/project/settings/' . $_REQUEST['projCode']);
 		$selected_group = $request['selected_group'];
 		$projCode = $request['projCode'];
@@ -565,6 +589,8 @@ class ProjectController
 
 	public function searchPeople()
 	{
+		abort_if(gate_denies('project_update_settings_access'), 403);
+
 		$request = Request::validate('/project/settings/' . $_REQUEST['project_code']);
 
 		$search_q = $request['search_q'];
@@ -594,15 +620,21 @@ class ProjectController
 
 	public function update()
 	{
+		abort_if(gate_denies('project_update_settings_access'), 403);
+
 		$request = Request::validate('/project/settings/' . $_REQUEST['code']);
 
 		$name = $request['name'];
 		$description = $request['description'];
 		$code = $request['code'];
+		$project_cost = $request['project_cost'];
+		$project_deadline = $request['project_deadline'];
 
 		$data = array(
 			'projectName' => $name,
-			'projectDescription' => $description
+			'projectDescription' => $description,
+			'projectCost' => $project_cost,
+			'projectDeadline' => date('Y-m-d H:i:s', strtotime($project_deadline))
 		);
 
 		$res = DB()->update("projects", $data, "projectCode = '$code'");

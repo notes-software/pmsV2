@@ -26,7 +26,7 @@ use App\Core\Request;
             font-weight: 300;
             font-family: Nunito;
             color: #26425f;
-            background: #eef1f4;
+            background: #fff;
         }
 
         .card {
@@ -42,16 +42,29 @@ use App\Core\Request;
 </head>
 
 <body>
-    <div class="container" style="margin-top: 3%;">
+    <div class="container px-5" style="margin-top: 10%;">
         <div class="row justify-content-md-center">
+            <div class="col-md-7">
+                <div class="row mt-3">
+                    <div class="col-sm-12">
+                        <h2 class="mb-3 font-weight-normal">
+                            <?= App::get('config')['app']['name'] ?>
+                        </h2>
+                    </div>
+                </div>
+                <p>Offers free unlimited projects and tasks with unlimited collaborators.</p>
+                <ul>
+                    <li>Tracks your productivity</li>
+                    <li>Reminds your task for today</li>
+                    <li>Reminds your past due tasks</li>
+                    <li>Assign permission to users</li>
+                    <li>Take note of your thoughts</li>
+                    <li>Built from <a href="https://sprnva.space/" rel="nofollow noreferrer noopener" target="_blank">Sprnva Framework</a></li>
+                </ul>
+            </div>
+
             <div class="col-md-5">
-                <div class="text-center mb-3">
-                    <img src="<?= public_url('/storage/images/sprnva-logo.png') ?>" alt="sprnva-logo" style="width: 100px; height: 100px;">
-                </div>
-                <div class="text-center mb-3">
-                    <h3><?= App::get('config')['app']['name'] ?></h3>
-                </div>
-                <div class="card mt-4" style="background-color: #fff; border: 0px; border-radius: 8px; box-shadow: 0 4px 5px 0 rgba(0,0,0,0.2);">
+                <div class="card mt-4" style="background-color: #fff; border: 0px; border-radius: 8px; box-shadow: none; border: 1px solid #bfbfbf;">
                     <div class="card-body">
 
                         <?= alert_msg(); ?>
@@ -70,11 +83,15 @@ use App\Core\Request;
                                 <a href="<?= route('/forgot/password'); ?>" style="font-size: 18px;">
                                     <small id="emailHelp" class="form-text text-muted mb-1">Forgot password?</small>
                                 </a>
-                                <div class="d-flex justify-content-end ml-3"><button type="submit" class="btn btn-secondary btn-sm text-rigth">LOGIN</button></div>
+                            </div>
+                            <div class="form-group mt-2">
+                                <button type="submit" class="btn btn-success btn-md btn-block">LOGIN</button>
                             </div>
                         </form>
                     </div>
                 </div>
+                <!-- <small>Don't have an account yet? <a href="<? //= route('/register') 
+                                                                ?>">Register now</a></small> -->
             </div>
         </div>
     </div>

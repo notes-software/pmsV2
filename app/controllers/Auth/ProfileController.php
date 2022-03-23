@@ -4,7 +4,9 @@ namespace App\Controllers;
 
 use App\Core\App;
 use App\Core\Auth;
+use App\Core\Filesystem\Filesystem;
 use App\Core\Request;
+use App\Core\Storage;
 
 class ProfileController
 {
@@ -54,5 +56,41 @@ class ProfileController
         DB()->delete('users', "id = '$user_id'");
 
         Auth::logout();
+    }
+
+    public function uploadAvatar()
+    {
+        $user_id = Auth::user('id');
+        if (Storage::hasFile('upload_file')) {
+            $file = Storage::file('upload_file');
+
+            $file_tmp = $file->getTmpFile();
+            $file_name = $file->getName();
+            $fileSize = $file->getSize();
+            $file_type = $file->type();
+            $file_extension = $file->getExtension();
+
+            $filename = strtoupper(randChar(4)) . date('Ymdhis') . "." . $file_extension;
+            $dir = "public/storage/images/{$user_id}";
+
+            if (!Filesystem::exists($dir . "/" . $filename)) {
+
+                $isStored = $file->storeAs($file_tmp, $dir, $file_type, $filename);
+
+                if ($isStored) {
+
+                    DB()->update("users", [
+                        "slug" => "/storage/images/{$user_id}/{$filename}"
+                    ], "id = '$user_id'");
+
+                    redirect('/profile', ["message" => "Avatar updated."]);
+                } else {
+
+                    redirect('/profile', ["message" => "Avatar updated."]);
+                }
+            }
+        } else {
+            redirect('/profile', ["message" => "no file chosen."]);
+        }
     }
 }

@@ -91,11 +91,6 @@ require __DIR__ . '/../layouts/head.php'; ?>
 
             </div>
         </div>
-        <!-- /.card-body -->
-        <!-- <div class="card-footer">
-            Footer
-        </div> -->
-        <!-- /.card-footer-->
     </div>
     <!-- /.card -->
 </section>

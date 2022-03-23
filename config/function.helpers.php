@@ -151,7 +151,7 @@ function showMenus($sideMenuData)
 	return $menus;
 }
 
-function log_activity($msg, $module, $user_id, $task_code)
+function log_activity($msg, $module, $user_id, $task_code = '')
 {
 	$data = array(
 		'log' => $msg,
@@ -184,7 +184,7 @@ function getTaskMember($project_code, $task_id)
 			$task_member_data[] = array(
 				'task_member_id'    => $task_list['user_id'],
 				'member_name'       => $_task_list['fullname'],
-				'member_avatar'     => public_url("/assets/pms/user_avatar/{$showPic}"),
+				'member_avatar'     => getUserAvatar($task_list['user_id']),
 				'invite_status'     => $task_list['invite_status']
 			);
 		}
@@ -271,9 +271,16 @@ function getProjectMember($code)
 
 function getUserAvatar($user_id)
 {
-	$res = DB()->select("slug", "users", "id = '$user_id'")->get();
-	$showPic = ($res['slug'] != "") ? $res['slug'] : 'user_default_avatar.png';
-	return public_url("/assets/pms/user_avatar/{$showPic}");
+	$user_avatar = DB()->select('slug', 'users', "id = '$user_id'")->get();
+
+	if ($user_avatar['slug'] != "") {
+		// dd($user_avatar);
+		$_avatar = public_url($user_avatar['slug']);
+	} else {
+		$_avatar = public_url('/storage/images/default.png');
+	}
+
+	return $_avatar;
 }
 
 function getMyGroups($user_id)

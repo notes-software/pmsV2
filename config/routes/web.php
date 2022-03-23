@@ -79,21 +79,6 @@ Route::group(['prefix' => 'project', 'middleware' => ['auth']], function () {
     });
 });
 
-Route::group(['prefix' => 'purchase', 'middleware' => ['auth']], function () {
-    Route::get('/', ['PurchaseController@index']);
-    Route::get('/create', ['PurchaseController@create']);
-    Route::post('/additem', ['PurchaseController@addItem']);
-    Route::post('/displayItems', ['PurchaseController@displayItems']);
-    Route::post('/save', ['PurchaseController@store']);
-    Route::get('/view/{id}', ['PurchaseController@edit']);
-    Route::post('/update', ['PurchaseController@update']);
-    Route::post('/delete', ['PurchaseController@destroy']);
-    Route::post('/selectUnit', ['PurchaseController@selectUnit']);
-    Route::post('/deleteItem', ['PurchaseController@deleteItem']);
-    Route::get('/print/{id}', ['PurchaseController@poPrint']);
-    Route::post('/finish', ['PurchaseController@finish']);
-});
-
 Route::group(['prefix' => 'settings', 'middleware' => ['auth']], function () {
     Route::group(['prefix' => '/permission', 'middleware' => ['auth']], function () {
         Route::get('/', ['SettingsController@permissionIndex']);
@@ -126,6 +111,8 @@ Route::get('/whatsnew', function () {
     echo $pd->text($mdContent);
 });
 
-Route::get('/test', function () {
-    dd(Route::uriCollection());
+Route::group(['prefix' => 'activitylogs', 'middleware' => ['auth']], function () {
+    Route::controller(['LogsController', ['auth']], function () {
+        Route::get('/', 'logsIndex');
+    });
 });

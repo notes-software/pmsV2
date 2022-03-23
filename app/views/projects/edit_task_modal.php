@@ -41,7 +41,7 @@
                             </div>
                             <div class="col-12">
                                 <div class="form-group">
-                                    <label for="task_v_desc">Task description</label>
+                                    <label for="task_v_desc">Task description</label> (<small class="text-orange"><i>you can add code blocks here</i></small>)
                                     <div style="font-size: 16px;font-family: myFirstFont;word-break: break-word;white-space: pre-wrap;color: #4e4e4e; margin-bottom: 5px;line-height: 22px;-webkit-user-modify: read-write-plaintext-only;outline: -webkit-focus-ring-color auto 0px;background-color: #e6e6e6;padding: 8px;border-radius: 4px;" contenteditable="true" id="v_task_desc"></div>
                                 </div>
                             </div>

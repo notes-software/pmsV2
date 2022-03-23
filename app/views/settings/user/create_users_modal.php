@@ -17,10 +17,10 @@
                         <div class="form-group">
                             <label for="name">Name</label>
                             <select class="form-control select2" name="name" id="name" style="width: 100%;">
-                                <option value="">-- select employee --</option>
+                                <option value="">-- select user --</option>
                                 <?php
-                                foreach ($employees as $employee) {
-                                    echo "<option value='" . $employee['fullname'] . "'>" . $employee['fullname'] . "</option>";
+                                foreach ($users as $user) {
+                                    echo "<option value='" . $user['fullname'] . "'>" . $user['fullname'] . "</option>";
                                 }
                                 ?>
                             </select>

@@ -117,7 +117,6 @@ require 'layouts/head.php'; ?>
                     </div>
                     <!-- /.card-header -->
                     <div class="card-body">
-
                         <table class="table table-sm">
                             <tbody>
                                 <?php
@@ -165,12 +164,6 @@ require 'layouts/head.php'; ?>
                                 ?>
                             </tbody>
                         </table>
-
-
-
-
-
-
                     </div>
                     <!-- /.card-body -->
                 </div>
@@ -181,20 +174,12 @@ require 'layouts/head.php'; ?>
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-12">
-                                <h4 class="m-0" style="color: #000; font-family: 'myFirstFont';">Project Management System</h4>
-                                <p class="text-muted" style="font-size: 14px;">Project management is the application of processes, methods, skills, knowledge and experience to achieve specific project objectives according to the project acceptance criteria within agreed parameters. Project management has final deliverables that are constrained to a finite timescale and budget.</p>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- /.card-body -->
-                </div>
-
-                <div class="card">
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <span style="font-size: 16px;">Current Version (v1.1)</span>
-                                <button type="button" class="btn btn-default btn-sm" onclick="openChangeLog()">What's new?</button>
+                                <p><b>System Changes:</b></p>
+                                <ul>
+                                    <li>
+                                        <a href="#" onclick="openChangeLog()" style="font-size: 14px;">Change Log</a>
+                                    </li>
+                                </ul>
                             </div>
                         </div>
                     </div>

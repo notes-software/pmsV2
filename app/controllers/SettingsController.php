@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Core\Auth;
 use App\Core\Request;
 
 class SettingsController
@@ -29,6 +30,8 @@ class SettingsController
             "date" => date('Y-m-d')
         ]);
 
+        log_activity(Auth::user('fullname') . " added permission [{$request['title']}]", 'Permission', Auth::user('id'));
+
         return redirect('/settings/permission', ["message" => "Added successfully."]);
     }
 
@@ -51,6 +54,8 @@ class SettingsController
             'u_permission_id' => ['required'],
             'u_title' => ['required']
         ]);
+
+        log_activity(Auth::user('fullname') . " updated permission [{$request['u_title']}]", 'Permission', Auth::user('id'));
 
         DB()->update("permissions", [
             "title" => $request['u_title']
@@ -96,6 +101,8 @@ class SettingsController
             "created_at" => date('Y-m-d')
         ]);
 
+        log_activity(Auth::user('fullname') . " added roles [{$request['title']}]", 'Roles', Auth::user('id'));
+
         return redirect('/settings/roles', ["message" => "Added successfully."]);
     }
 
@@ -140,6 +147,8 @@ class SettingsController
             "permission" => $permissions
         ], "id = '$request[u_roles_id]'");
 
+        log_activity(Auth::user('fullname') . " updated roles [{$request['u_title']}]", 'Roles', Auth::user('id'));
+
         return redirect('/settings/roles', ["message" => "Updated successfully."]);
     }
 
@@ -157,16 +166,14 @@ class SettingsController
         abort_if(gate_denies('settings_access'), 403);
 
         $pageTitle = "Users";
-        $branch = $_SESSION['system']['branch_id'];
 
         $users = DB()->selectLoop("*", "users", "id > 0 ORDER BY id DESC")
             ->with([
                 "roles" => ['role_id', 'id']
             ])->get();
         $roles = DB()->selectLoop("*", "roles", "id > 0 ORDER BY role ASC")->get();
-        $employees = DB()->selectLoop("*", "employee", "id > 0 ORDER BY fullname ASC")->get();
 
-        return view('/settings/user/index', compact('pageTitle', 'users', 'roles', 'employees'));
+        return view('/settings/user/index', compact('pageTitle', 'users', 'roles'));
     }
 
     public function userStore()
@@ -188,6 +195,8 @@ class SettingsController
             'updated_at' => date("Y-m-d H:i:s"),
             'created_at' => date("Y-m-d H:i:s")
         ]);
+
+        log_activity(Auth::user('fullname') . " added user [{$request['name']}]", 'Users', Auth::user('id'));
 
         return redirect('/settings/users', ["message" => "Added successfully."]);
     }
@@ -224,6 +233,8 @@ class SettingsController
             'role_id' => $request['u_roles'],
             'updated_at' => date("Y-m-d H:i:s")
         ], "id = '$request[u_users_id]'");
+
+        log_activity(Auth::user('fullname') . " updated user [{$request['u_name']}]", 'Users', Auth::user('id'));
 
         return redirect('/settings/users', ["message" => "Updated successfully."]);
     }

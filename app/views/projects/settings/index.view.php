@@ -109,6 +109,20 @@ $projectCode = (empty($projectDetail['projectCode'])) ? 0 : $projectDetail['proj
                                 </div>
                             </div>
                             <div class="row">
+                                <div class="col-6">
+                                    <div class="form-group">
+                                        <label for="ps_project_cost">Cost Estimate</label>
+                                        <input type="number" id="ps_project_cost" class="form-control" value="<?= $projectDetail["projectCost"] ?>">
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="form-group">
+                                        <label for="ps_project_deadline">Deadline</label>
+                                        <input type="date" id="ps_project_deadline" class="form-control" value="<?= date('Y-m-d', strtotime($projectDetail["projectDeadline"])) ?>">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
                                 <div class="col-12">
                                     <div class="form-group">
                                         <label for="project_desc">Project description (optional)</label>
@@ -117,27 +131,31 @@ $projectCode = (empty($projectDetail['projectCode'])) ? 0 : $projectDetail['proj
                                 </div>
                             </div>
 
-                            <div class="row">
-                                <div class="col" style="display: flex;flex-direction: row;justify-content: space-between;">
-                                    <?php
-                                    if ($projectDetail["status"] != 1) {
-                                    ?>
-                                        <button class="btn btn-success btn-md" id="save_proj_btn" onclick="updateProject()">Save changes</button>
-                                        <button class="btn btn-warning btn-md" id="close_proj_btn" onclick="closeProject()">Close project</button>
-                                    <?php } ?>
-                                </div>
-                            </div>
+                            <?php if (isProjectManager($projectDetail['projectCode']) == 1 || isProjectTeamLeader($projectDetail['projectCode']) == 1) { ?>
 
-                            <div class="row">
-                                <div class="col-12">
-                                    <hr>
+                                <div class="row">
+                                    <div class="col" style="display: flex;flex-direction: row;justify-content: space-between;">
+                                        <?php
+                                        if ($projectDetail["status"] != 1) {
+                                        ?>
+                                            <button class="btn btn-success btn-md" id="save_proj_btn" onclick="updateProject()">Save changes</button>
+                                            <button class="btn btn-warning btn-md" id="close_proj_btn" onclick="closeProject()">Close project</button>
+                                        <?php } ?>
+                                    </div>
                                 </div>
-                                <div class="col-12">
-                                    <h3>Remove project</h3>
-                                    <p class="text-muted">Removing the project will delete all related resources including task, linked members etc. <br><b>Removed projects cannot be restored!</b></p>
-                                    <a href="#" class="btn btn-danger btn-md" id="remove_proj_btn" onclick="removeProject()">Remove project</a>
+
+                                <div class="row">
+                                    <div class="col-12">
+                                        <hr>
+                                    </div>
+                                    <div class="col-12">
+                                        <h3>Remove project</h3>
+                                        <p class="text-muted">Removing the project will delete all related resources including task, linked members etc. <br><b>Removed projects cannot be restored!</b></p>
+                                        <a href="#" class="btn btn-danger btn-md" id="remove_proj_btn" onclick="removeProject()">Remove project</a>
+                                    </div>
                                 </div>
-                            </div>
+
+                            <?php } ?>
                         </div>
                     </div>
                 </div>
@@ -155,7 +173,9 @@ $projectCode = (empty($projectDetail['projectCode'])) ? 0 : $projectDetail['proj
                                 </div>
 
                                 <div class="card-title">
-                                    <button type="button" class="btn btn-default btn-sm" onclick="inviteMemberToProj()" data-toggle="tooltip" data-placement="bottom" data-original-title="Invite member"><i class="fas fa-plus"></i></button>
+                                    <?php if (isProjectManager($projectDetail['projectCode']) == 1 || isProjectTeamLeader($projectDetail['projectCode']) == 1) { ?>
+                                        <button type="button" class="btn btn-default btn-sm" onclick="inviteMemberToProj()" data-toggle="tooltip" data-placement="bottom" data-original-title="Invite member"><i class="fas fa-plus"></i></button>
+                                    <?php } ?>
                                 </div>
                             </div>
                         </div>
@@ -198,7 +218,9 @@ $projectCode = (empty($projectDetail['projectCode'])) ? 0 : $projectDetail['proj
                 for (var tdt = 0; tdt < membr_len; tdt++) {
                     var prjmem = projmember.proj_member[tdt];
 
-                    member_list += '<li class="list-group-item ch-padd-hover mb-1" style="display: flex;align-items: center;justify-content: space-between;padding: 5px;border: 0px !important;width: -webkit-fill-available;"><div style="width: 80%;display: flex;justify-content: center;flex-direction: row;align-items: center;align-content: center;padding: 3px 5px 3px 5px;"><a class="avatar rounded-circle" style="width: 35px; height: 30px;"><img src=' + prjmem.avatar + ' style="width: 100%;height: 100%;object-fit: cover;" class="rounded-circle" data-toggle="tooltip" data-placement="left"></a><h4 class="text-muted" style="font-family: myFirstFont;font-size: 1rem;font-weight: 400;text-overflow: ellipsis;white-space: nowrap;overflow: hidden;margin-bottom: 0px;width: -webkit-fill-available;margin-left: 7px;">' + prjmem.name + '</h4></div><div class="col-2"><div style="align-items: baseline;justify-content: flex-end;display: flex;"><span class="badge badge-danger"></span><a class="btn btn-link btn-sm" style="color: red;"><i class="far fa-trash-alt" onclick="removeProjectMember(' + prjmem.id + ')" data-toggle="tooltip" data-placement="bottom" data-title="Remove"></i></a></div></div></li>';
+                    var allow_delete = (prjmem.allowDelete == 1) ? '<a class="btn btn-link btn-sm" style="color: red;"><i class="far fa-trash-alt" onclick="removeProjectMember(' + prjmem.id + ')" data-toggle="tooltip" data-placement="bottom" data-title="Remove"></i></a>' : '';
+
+                    member_list += '<li class="list-group-item ch-padd-hover mb-1" style="display: flex;align-items: center;justify-content: space-between;padding: 5px;border: 0px !important;width: -webkit-fill-available;"><div style="width: 80%;display: flex;justify-content: center;flex-direction: row;align-items: center;align-content: center;padding: 3px 5px 3px 5px;"><a class="avatar rounded-circle" style="width: 35px; height: 30px;"><img src=' + prjmem.avatar + ' style="width: 100%;height: 100%;object-fit: cover;" class="rounded-circle" data-toggle="tooltip" data-placement="left"></a><h4 class="text-muted" style="font-family: myFirstFont;font-size: 1rem;font-weight: 400;text-overflow: ellipsis;white-space: nowrap;overflow: hidden;margin-bottom: 0px;width: -webkit-fill-available;margin-left: 7px;">' + prjmem.name + '</h4></div><div class="col-2"><div style="align-items: baseline;justify-content: flex-end;display: flex;"><span class="badge badge-danger"></span>' + allow_delete + '</div></div></li>';
                 }
 
                 $("#members_data_list").html(member_list);
@@ -307,11 +329,15 @@ $projectCode = (empty($projectDetail['projectCode'])) ? 0 : $projectDetail['proj
         var code = $("#ps_project_code").val();
         var name = $("#ps_project_name").val();
         var description = $("#project_desc").val();
+        var project_cost = $("#ps_project_cost").val();
+        var project_deadline = $("#ps_project_deadline").val();
 
         $.post(base_url + "/project/settings/update", {
             name: name,
             description: description,
-            code: code
+            code: code,
+            project_cost: project_cost,
+            project_deadline: project_deadline
         }, function(data) {
             if (data == 1) {
                 alertMe('success', 'Changes saved.');

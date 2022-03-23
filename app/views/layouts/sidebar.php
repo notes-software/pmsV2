@@ -10,7 +10,7 @@ use App\Core\Request;
 	<!-- Brand Logo -->
 	<a href="<?= route('/') ?>" class="brand-link text-center">
 		<span class="brand-image img-circle elevation-3" style="opacity: .8"></span>
-		<span class="brand-text font-weight-light"><?= App::get('config')['app']['name'] ?></span>
+		<span class="brand-text font-weight-bold"><?= App::get('config')['app']['name'] ?></span>
 	</a>
 
 	<!-- Sidebar -->
@@ -46,17 +46,17 @@ use App\Core\Request;
 							]
 						]
 					],
-					'REQUEST BOOK' => [
-						'isTree' => 0,
-						'icon' => 'fas fa-book',
-						'child' => [
-							'request_book_access' => [
-								'route' => '/requestbook',
-								'name' => 'requestbook',
-								'level' => 2
-							]
-						]
-					],
+					// 'REQUEST BOOK' => [
+					// 	'isTree' => 0,
+					// 	'icon' => 'fas fa-book',
+					// 	'child' => [
+					// 		'request_book_access' => [
+					// 			'route' => '/requestbook',
+					// 			'name' => 'requestbook',
+					// 			'level' => 2
+					// 		]
+					// 	]
+					// ],
 					'NOTEBOOK' => [
 						'isTree' => 0,
 						'icon' => 'far fa-sticky-note',
@@ -76,6 +76,17 @@ use App\Core\Request;
 								'route' => '/project',
 								'name' => 'project',
 								'level' => 4
+							]
+						]
+					],
+					'ACTIVITY LOGS' => [
+						'isTree' => 0,
+						'icon' => 'fas fa-book',
+						'child' => [
+							'activity_log_access' => [
+								'route' => '/activitylogs',
+								'name' => 'activitylogs',
+								'level' => 0
 							]
 						]
 					],

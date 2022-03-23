@@ -12,7 +12,7 @@
                 <div class="row">
 
                     <div class="col">
-                        <div class="form-group">
+                        <div class="form-group mb-1">
                             <label for="task_date"><i class="far fa-clock"></i> <span id="calendarDate"></span></label>
                         </div>
                         <div class="form-group">
@@ -22,7 +22,7 @@
                         <div class="form-group">
                             <label for="cal_project">Project</label>
                             <select name="cal_project" id="cal_project" class="form-control">
-                                <option value="PERSONAL">Personal</option>
+                                <!-- <option value="PERSONAL">Personal</option> -->
                                 <?php
                                 // dd($projects);
                                 foreach ($projects as $project) :

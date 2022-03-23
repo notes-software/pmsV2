@@ -4,7 +4,7 @@
             <form action="<?= route('/settings/users/update') ?>" method="POST">
                 <input type="hidden" id="u_users_id" name="u_users_id">
                 <div class="modal-header">
-                    <h4 class="modal-title">Branch Detail</h4>
+                    <h4 class="modal-title">User Detail</h4>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -18,10 +18,10 @@
                         <div class="form-group">
                             <label for="u_name">Name</label>
                             <select class="form-control select2" name="u_name" id="u_name" style="width: 100%;">
-                                <option value="">-- select employee --</option>
+                                <option value="">-- select user --</option>
                                 <?php
-                                foreach ($employees as $employee) {
-                                    echo "<option value='" . $employee['fullname'] . "'>" . $employee['fullname'] . "</option>";
+                                foreach ($users as $user) {
+                                    echo "<option value='" . $user['fullname'] . "'>" . $user['fullname'] . "</option>";
                                 }
                                 ?>
                             </select>

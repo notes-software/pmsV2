@@ -10,7 +10,7 @@ class DashboardController
 
     public function index()
     {
-        // abort_if(gate_denies('dashboard_access'), 403);
+        abort_if(gate_denies('dashboard_access'), 403);
 
         $pageTitle = "Dashboard";
 

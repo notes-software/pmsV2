@@ -10,7 +10,7 @@ class NotebookController
 {
 	public function index()
 	{
-		// abort_if(gate_denies('branch_access'), 403);
+		abort_if(gate_denies('notebook_access'), 403);
 
 		$pageTitle = "Notebook";
 
@@ -68,21 +68,6 @@ class NotebookController
 			}
 		}
 	}
-
-	/**
-	 * <div class="row"><span class="badge badge-secondary">work</span></div>
-	 * 
-	 */
-
-	/**
-	 * <textarea class="card-title note-title" rows="1" placeholder="Title" maxlength="999" dir="ltr" style="height: 20px;font-size: 16px; font-style: bolder; font-family: inherit;margin-bottom: 15px;" id="update_note_title_' . $note_list['id'] . '">' . $note_list["title"] . '</textarea>
-	 * 
-	 */
-
-	/**
-	 * <span class="" data-toggle="tooltip" data-placement="bottom" data-original-title="Delete Note" onclick="deleteNote(\'' . $note_list['id'] . '\')" style="right: 15px !important;"><i class="far fa-trash-alt" style="color: red;font-size: 12px;"></i></span><span class="" data-toggle="tooltip" data-placement="bottom" data-original-title="Save Changes" style="right: 35;" onclick="updateNote(\'' . $note_list['id'] . '\')"><i class="fas fa-save" style="font-size: 13px;"></i></span>
-	 * 
-	 */
 
 	public function delete()
 	{

@@ -42,12 +42,7 @@ if (empty($_SESSION['system']['branch_id'])) {
 		}
 
 		.nav-link {
-			padding: 0.3rem;
 			font-weight: 500;
-		}
-
-		.nav-sidebar>.nav-item .nav-icon {
-			font-size: 0.7rem !important;
 		}
 
 		.brand-link {
@@ -70,14 +65,6 @@ if (empty($_SESSION['system']['branch_id'])) {
 
 		.main-footer {
 			border-top: 0px solid #dee2e6;
-		}
-
-		.layout-navbar-fixed .wrapper .content-wrapper {
-			margin-top: calc(2.6rem + 1px);
-		}
-
-		.layout-navbar-fixed.layout-fixed .wrapper .sidebar {
-			margin-top: calc(2.6rem + 1px);
 		}
 
 		body {
